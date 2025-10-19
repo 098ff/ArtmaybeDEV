@@ -18,8 +18,10 @@ app.use(cookieParser());
 connectDB();
 
 // TODO: Route files
+const auth = require("./routes/auth");
 
 // TODO: Mount routers
+app.use(`/api/v1/auth`, auth);
 
 // Use || 5000 for running in window
 const PORT = process.env.PORT || 5000;

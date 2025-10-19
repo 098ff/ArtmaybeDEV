@@ -40,9 +40,11 @@ const UserSchema = new mongoose.Schema({
         type: {
             type: String,
             enum: ['Point'], // 'location.type' must be 'Point'
+            required: true
         },
         coordinates: {
             type: [Number], // Array of numbers [longitude, latitude]
+            index: '2dsphere'
         }
     },
     resetPasswordToken: String,

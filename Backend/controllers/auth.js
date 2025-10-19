@@ -5,7 +5,7 @@ const User = require('../models/User');
 //@access  Public
 exports.register = async (req, res, next) => {
     try {
-        const { name, email, password, role } = req.body;
+        const { name, telephone, email, password, role, address, location } = req.body;
 
         // Create user 
         const user = await User.create({
@@ -15,10 +15,7 @@ exports.register = async (req, res, next) => {
             password,
             role,
             address,
-            location: {
-                type: 'Point',
-                coordinates: [lon, lat] // Must always be 'lon' before 'lat'
-            }
+            location
         });
 
         sendTokenResponse(user, 200, res); // Use this function to create token & send status
@@ -32,12 +29,13 @@ exports.register = async (req, res, next) => {
 //@route    POST /api/v1/auth/login
 //@access   Public
 exports.login = async (req, res, next) => {
-    // Validate email & password
     const { email, password } = req.body;
+
+    // Validate email & password
     if (!email || !password) {
         return res.status(400).json({
             success: false,
-            msg: 'Please provide an email and password'
+            msg: 'Please provide your email and password'
         });
     }
 
