@@ -103,7 +103,7 @@ exports.getCompany = async (req, res, next) => {
 exports.getCompaniesbyDistance = async (req, res, next) => {
     try {
         // 1. Receive Max Distance from user
-        const maxDrivingDistanceKm = parseFloat(req.query.distance || 10); // Default = 20 km
+        const maxDrivingDistanceKm = parseFloat(req.query.distance || 20); // Default = 20 km
 
         // 2. Setup board radius (x3) for filter some company that might be in user distance
         const searchRadiusKm = maxDrivingDistanceKm * 3;
