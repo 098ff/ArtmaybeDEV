@@ -42,4 +42,12 @@ const CompanySchema = new mongoose.Schema({
     toObject: { virtuals: true }
 });
 
+// TODO : Populate Booking data to nested in Company data (Waiting for finish booking api)
+// BookingSchema.virtual(`bookings`, {
+//     ref: `Booking`,
+//     localField: `_id`,
+//     foreignField: `company`,
+//     justOne: false // fetch data in array (not just 1 data)
+// });
+
 module.exports = mongoose.model("Company", CompanySchema);
