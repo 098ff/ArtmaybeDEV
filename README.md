@@ -170,6 +170,7 @@ Here are the main API endpoints available. (🔒 = Authentication Required)
 |:-------|:---------------------|:----------------------------------------------|
 | `GET`  | `/`                  | Get a list of all companies.                  |
 | `GET`  | `/:id`               | Get details for a specific company.           |
+| `GET`  | `/search/dist`        | Search for companies by distance.             |
 
 #### **User Favorites (🔒) (`/api/users`)**
 | Method   | Endpoint                       | Description                                |
