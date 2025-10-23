@@ -33,7 +33,7 @@ const CompanySchema = new mongoose.Schema({
         },
         coordinates: {
             type: [Number], // Array of numbers [longitude, latitude]
-            index: '2dsphere'
+            // index: '2dsphere'
         }
     },
 },
@@ -41,7 +41,7 @@ const CompanySchema = new mongoose.Schema({
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
 });
-
+CompanySchema.index({ location: '2dsphere' });
 // TODO : Populate Booking data to nested in Company data (Waiting for finish booking api)
 // BookingSchema.virtual(`bookings`, {
 //     ref: `Booking`,
