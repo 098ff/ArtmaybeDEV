@@ -3,29 +3,28 @@ const Company = require('../models/Company');
 // TODO : Implement Booking model for populate Booking info into Company info
 // const Booking = require('../models/Booking');
 
+// TODO : Implement filter companies by distance in GET /api/v1/companies
+
 // @desc    GET all companies
 // @route   GET /api/v1/companies
 // @access  Public
 exports.getCompanies = async (req, res, next) => {
     let query;
 
-    // Copy req.query
     const reqQuery = {...req.query};
 
-    // Fields to exclude เอาออกเพราะต้องการจัดการกับการ query > < = ก่อน
+    // Fields to exclude for process on > < = first
     const removeFields = ['select', 'sort', 'page', 'limit'];
 
-    // Loop over removeFields and delete them from reqQuery
     removeFields.forEach(param => delete reqQuery[param]);
     console.log(reqQuery);
 
-    // Create query string
     let queryStr = JSON.stringify(reqQuery);
 
-    // Convert gt, gte, lt, lte, in into $gt, $gte, $lt, $lte, $in in Regular Expression format by //g
-    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`); // \b = word boundary e.g. [] {} , ()
-    // Finding resources
-    query = Company.find(JSON.parse(queryStr)).populate(`appointments`); // Convert back into Object for send to find()
+    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
+    // TODO : Finding resources when populate (If booking is done you the commented code instead)
+    // query = Company.find(JSON.parse(queryStr)).populate(`bookings`); // Convert back into Object for send to find()
+    query = Company.find(JSON.parse(queryStr));
 
     // Select Fields
     if (req.query.select) {
@@ -86,7 +85,7 @@ exports.getCompanies = async (req, res, next) => {
 // @access  Public
 exports.getCompany = async (req, res, next) => {
     try {
-        const company = await company.findById(req.params.id);
+        const company = await Company.findById(req.params.id);
 
         if (!company) {
             return res.status(400).json({ success: false });

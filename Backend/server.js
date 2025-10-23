@@ -2,6 +2,8 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const connectDB = require("./config/db");
+// Require cors for enable React to communicate with Nodejs
+const cors = require('cors');
 
 dotenv.config({path: './config/config.env'});
 const app = express();
@@ -15,13 +17,17 @@ app.use(express.json());
 // Cookie parser
 app.use(cookieParser());
 
+app.use(cors());
+
 connectDB();
 
 // TODO: Route files
-const auth = require("./routes/auth");
+const auth = require('./routes/auth');
+const companies = require('./routes/companies');
 
 // TODO: Mount routers
 app.use(`/api/v1/auth`, auth);
+app.use(`/api/v1/companies`, companies);
 
 // Use || 5000 for running in window
 const PORT = process.env.PORT || 5000;
