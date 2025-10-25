@@ -175,6 +175,8 @@ exports.getCompaniesbyDistance = async (req, res, next) => {
             // Sort from near -> far
             .sort((a, b) => a.distance - b.distance); 
 
+        console.log(finalCompanies);
+        
         res.status(200).json({
             success: true,
             count: finalCompanies.length,
