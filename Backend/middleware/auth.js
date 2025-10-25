@@ -12,8 +12,8 @@ exports.protect = async (req, res, next) => {
         token = req.headers.authorization.split(' ')[1];
     }
 
-    // Make sure token exists
-    if (!token) {
+    // Make sure token exists or it's null when user logout
+    if (!token || token == 'null') {
         return res.status(401).json({
             success: false,
             message: 'Not authorize to access this route'
