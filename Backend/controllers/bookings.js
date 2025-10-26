@@ -21,8 +21,7 @@ exports.createBooking = async (req, res, next) => {
     }
 
     //Add user to booking
-    //req.body.user = req.user.id;
-    req.body.user = "68fcc1f5ffdb663c9ee5665a"; //call fai id because it too lazy to create
+    req.body.user = req.user.id;
 
     //Optional
     /*

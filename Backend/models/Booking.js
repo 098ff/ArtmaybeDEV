@@ -10,7 +10,6 @@ const BookingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: [true, "Please add a user name"],
-      trim: true,
     },
     company: {
       type: mongoose.Schema.Types.ObjectId,
