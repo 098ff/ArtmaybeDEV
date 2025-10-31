@@ -100,7 +100,7 @@ export default function Page() {
     return (
         <div className="page-favorites">
             <div>
-                <h1 className="page-title">Your Favorites</h1>
+                <h1 className="page-title">Favorite Companies</h1>
                 <h3 className="page-subtitle">
                     Companies you've saved for later.
                 </h3>
