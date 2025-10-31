@@ -2,17 +2,14 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5003/api/v1/';
 
-const getCompanies = async () => {
+const getCompanies = async (page = 1, limit = 6) => {
     try {
-        //  Fetch GET companies api
-        const response = await axios.get(API_URL + 'companies/');
-        console.log(JSON.stringify(response.data));
-        // .data แรกคือของ axios .data ที่สองคือของที่ api ส่งมา
-        return response.data.data;
+        const response = await axios.get(API_URL + `companies?page=${page}&limit=${limit}`);
+        return response.data;
     }
     catch (error) {
         console.log('companiesService: getCompanies');
-        console.log(error);
+        throw error;
     }
 };
 
