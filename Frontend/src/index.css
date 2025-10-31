@@ -359,12 +359,12 @@ body {
 }
 
 .company-card {
-  border: 1px solid #e5e7eb; /* สีเทาอ่อน */
-  border-radius: 0.75rem; /* 12px */
-  padding: 24px; /* 1.5rem */
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem; 
+  padding: 1.5rem;
   background-color: #ffffff;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  position: relative; /* สำหรับปุ่ม Heart */
+  position: relative; 
   height: 100%;
 }
 
@@ -379,7 +379,7 @@ body {
   padding: 0.25rem;
 }
 .company-card-heart:hover {
-  color: #ef4444;
+  color: #d12698;
 }
 
 .company-card-header {
@@ -404,8 +404,8 @@ body {
 }
 
 .favorited-heart {
-  color: #ef4444;
-  fill: #ef4444;
+  color: #d12698;
+  fill: #d12698;
 }
 
 .info-item {
@@ -493,4 +493,28 @@ body {
   text-align: center;
   font-size: 50px;
   color: #9ca3af;
+}
+
+.page-favorites {
+  display: flex;
+  flex-direction: column;
+  padding: 3rem 12rem;
+  gap: 0.875rem;
+}
+
+.page-favorites > :nth-child(1) {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.125rem;
+}
+
+.page-favorites h1 {
+  color: #0f0826;
+  font-size: 2.8125rem;
+}
+
+.page-favorites h3 {
+  color: #939298;
+  font-weight: 400;
+  font-size: 1.25rem;
 }
