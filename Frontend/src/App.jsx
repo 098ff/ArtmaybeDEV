@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Header from './components/Header';
+import Companies from './pages/Companies';
+import Favorites from './pages/Favorites';
+import { CookiesProvider, useCookies } from 'react-cookie';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const PrivateRoutes = () => {
+  let auth = useCookies(['token'])[0];
+  console.log(auth.token);
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    auth.token !== "" ? <Outlet /> : (<div className='go-login-text'> Please login via Postman</div>)
   )
 }
 
-export default App
+function App() {
+  return (
+    <>
+      {/* This is our Router DOM */}
+      <CookiesProvider>
+        <Router>
+          <div>
+            <Header />
+            <Routes>
+              {/* Given path to each Page */}
+              <Route element={<PrivateRoutes />}>
+                <Route path='/companies' element={<Companies />} />
+                <Route path='/favorites' element={<Favorites />} />
+              </Route>
+            </Routes>
+          </div>
+        </Router>
+      </CookiesProvider>
+      <ToastContainer />
+    </>
+  );
+}
+
+// Export for Index.js to use
+export default App;
