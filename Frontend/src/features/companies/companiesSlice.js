@@ -44,5 +44,4 @@ export const companiesSlice = createSlice({
     }
 });
 
-export const { reset } = companiesSlice.actions;
 export default companiesSlice.reducer;
