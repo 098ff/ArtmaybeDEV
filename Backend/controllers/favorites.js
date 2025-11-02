@@ -104,7 +104,7 @@ exports.deleteFavorite = async (req, res, next) => {
 
 //@desc     Get single favorite
 //@route    GET /api/v1/favorites/:id
-//@access   Public
+//@access   Private
 exports.getFavorite = async (req, res, next) => {
   try {
     const favorite = await Favorite.findById(req.params.id)
@@ -133,5 +133,47 @@ exports.getFavorite = async (req, res, next) => {
     return res
       .status(500)
       .json({ success: false, message: "Cannot find favorite" });
+  }
+};
+
+//@desc     Get all favorites
+//@route    GET /api/v1/favorites
+//@access   Private
+exports.getFavorites = async (req, res, next) => {
+  let query;
+  //General users can see only their appointments!
+  if (req.user.role !== "admin") {
+    query = Favorite.find({ user: req.user.id }).populate({
+      path: "company",
+      select: "name",
+    });
+  } else {
+    //If you are an admin, you can see all!
+    if (req.params.companyId) {
+      console.log(req.params.companyId);
+      query = Favorite.find({ company: req.params.companyId }).populate({
+        path: "company",
+        select: "name",
+      });
+    } else {
+      query = Favorite.find().populate({
+        path: "company",
+        select: "name",
+      });
+    }
+  }
+  try {
+    const favorite = await query;
+
+    res.status(200).json({
+      success: true,
+      count: favorite.length,
+      data: favorite,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot find Appointment" });
   }
 };

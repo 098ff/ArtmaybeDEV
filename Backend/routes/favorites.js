@@ -4,10 +4,14 @@ const {
   createFavorite,
   deleteFavorite,
   getFavorite,
+  getFavorites,
 } = require("../controllers/favorites");
 const { protect, authorize } = require("../middleware/auth");
 
-router.route("/").post(protect, authorize("user"), createFavorite);
+router
+  .route("/")
+  .get(protect, getFavorites)
+  .post(protect, authorize("user"), createFavorite);
 router
   .route("/:id")
   .get(protect, getFavorite)
