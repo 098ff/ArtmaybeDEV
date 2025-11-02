@@ -23,11 +23,15 @@ exports.createFavorite = async (req, res, next) => {
     //Add user to favorite
     req.body.user = req.user.id;
 
-    const favorites = await Favorite.create(req.body);
+    const favorite = await Favorite.create(req.body);
+
+    const populatedFavorite = await Favorite.findById(favorite._id)
+      .populate("user", "name")
+      .populate("company", "name");
 
     res.status(201).json({
       success: true,
-      data: favorites,
+      data: populatedFavorite,
     });
   } catch (err) {
     console.error(err.stack);
