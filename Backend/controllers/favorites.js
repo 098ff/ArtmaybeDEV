@@ -101,3 +101,37 @@ exports.deleteFavorite = async (req, res, next) => {
       .json({ success: false, message: "Cannot unfavorite" });
   }
 };
+
+//@desc     Get single favorite
+//@route    GET /api/v1/favorites/:id
+//@access   Public
+exports.getFavorite = async (req, res, next) => {
+  try {
+    const favorite = await Favorite.findById(req.params.id)
+      .populate({
+        path: "company",
+        select: "name",
+      })
+      .populate({
+        path: "user",
+        select: "name",
+      });
+
+    if (!favorite) {
+      return res.status(404).json({
+        success: false,
+        message: `No favorite with the id of ${req.params.id}`,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: favorite,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot find favorite" });
+  }
+};
