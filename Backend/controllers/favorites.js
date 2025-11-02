@@ -65,3 +65,39 @@ exports.createFavorite = async (req, res, next) => {
     });
   }
 };
+
+//@desc     Delete Favorite
+//@route    DELETE /api/v1/favorites/:id
+//@access   Private
+exports.deleteFavorite = async (req, res, next) => {
+  try {
+    const favorite = await Favorite.findById(req.params.id);
+
+    if (!favorite) {
+      return res.status(404).json({
+        success: false,
+        message: `No favorite with the id of ${req.params.id}`,
+      });
+    }
+
+    // Make sure user is the owner
+    if (favorite.user.toString() !== req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: `User ${req.user.id} is not authorized to unfavorite`,
+      });
+    }
+
+    await favorite.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      data: {},
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot unfavorite" });
+  }
+};
