@@ -35,9 +35,7 @@ exports.createFavorite = async (req, res, next) => {
 
     if (existed) {
       /*if already favorited return the exist one with duplicate = true*/
-      populatedFavorite = await Favorite.find({
-        favorite: existed._id,
-      })
+      populatedFavorite = await Favorite.findById(existed._id)
         .populate({ path: "company", select: "name" })
         .populate({ path: "user", select: "name" });
       duplicate = true;
@@ -45,9 +43,7 @@ exports.createFavorite = async (req, res, next) => {
       /*else create new with duplicate = false*/
       const favorite = await Favorite.create(req.body);
 
-      populatedFavorite = await Favorite.find({
-        favorite: favorite._id,
-      })
+      populatedFavorite = await Favorite.findById(favorite._id)
         .populate({ path: "company", select: "name" })
         .populate({ path: "user", select: "name" });
       duplicate = false;
