@@ -3,8 +3,8 @@ const Company = require("../models/Company");
 const User = require("../models/User");
 const Favorite = require("../models/Favorite");
 
-//@desc    Create Booking
-//@route   POST /api/v1/companies/:companyId/bookings
+//@desc    Create Favorite
+//@route   POST /api/v1/companies/:companyId/favorites
 //@access  Private
 exports.createFavorite = async (req, res, next) => {
   try {
@@ -23,16 +23,39 @@ exports.createFavorite = async (req, res, next) => {
     //Add user to favorite
     req.body.user = req.user.id;
 
-    const favorite = await Favorite.create(req.body);
-
-    const populatedFavorite = await Favorite.findById(favorite._id)
-      .populate("user", "name")
-      .populate("company", "name");
-
-    res.status(201).json({
-      success: true,
-      data: populatedFavorite,
+    //check if user already favorite this company
+    const existed = await Favorite.findOne({
+      user: req.user.id,
+      company: req.params.companyId,
     });
+
+    if (existed) {
+      const populatedFavorite = await Favorite.find({
+        favorite: existed._id,
+      })
+        .populate({ path: "company", select: "name" })
+        .populate({ path: "user", select: "name" });
+
+      return res.status(200).json({
+        success: true,
+        data: populatedFavorite, 
+        duplicate: true,
+      });
+    } else {
+      //create favorite
+      const favorite = await Favorite.create(req.body);
+
+      const populatedFavorite = await Favorite.find({
+        favorite: favorite._id,
+      })
+        .populate({ path: "company", select: "name" })
+        .populate({ path: "user", select: "name" });
+
+      res.status(201).json({
+        success: true,
+        data: populatedFavorite,
+      });
+    }
   } catch (err) {
     console.error(err.stack);
     res.status(400).json({
