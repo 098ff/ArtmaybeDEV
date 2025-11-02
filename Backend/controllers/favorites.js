@@ -20,6 +20,9 @@ exports.createFavorite = async (req, res, next) => {
       });
     }
 
+    let duplicate = false;
+    let populatedFavorite;
+
     //Add user to favorite
     req.body.user = req.user.id;
 
@@ -30,32 +33,27 @@ exports.createFavorite = async (req, res, next) => {
     });
 
     if (existed) {
-      const populatedFavorite = await Favorite.find({
+      populatedFavorite = await Favorite.find({
         favorite: existed._id,
       })
         .populate({ path: "company", select: "name" })
         .populate({ path: "user", select: "name" });
-
-      return res.status(200).json({
-        success: true,
-        data: populatedFavorite, 
-        duplicate: true,
-      });
+      duplicate = true;
     } else {
       //create favorite
       const favorite = await Favorite.create(req.body);
 
-      const populatedFavorite = await Favorite.find({
+      populatedFavorite = await Favorite.find({
         favorite: favorite._id,
       })
         .populate({ path: "company", select: "name" })
         .populate({ path: "user", select: "name" });
-
-      res.status(201).json({
-        success: true,
-        data: populatedFavorite,
-      });
     }
+    res.status(duplicate ? 200 : 201).json({
+      success: true,
+      data: populatedFavorite,
+      duplicate: duplicate,
+    });
   } catch (err) {
     console.error(err.stack);
     res.status(400).json({
