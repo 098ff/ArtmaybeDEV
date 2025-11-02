@@ -54,10 +54,12 @@ connectDB();
 // TODO: Route files
 const auth = require('./routes/auth');
 const companies = require('./routes/companies');
+const favorites = require('./routes/favorites');
 
 // TODO: Mount routers
 app.use(`/api/v1/auth`, auth);
 app.use(`/api/v1/companies`, companies);
+app.use(`/api/v1/favorites`, favorites);
 
 // Use || 5000 for running in window
 const PORT = process.env.PORT || 5000;
