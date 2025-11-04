@@ -107,27 +107,13 @@ exports.deleteFavorite = async (req, res, next) => {
 //@access   Private
 exports.getFavorites = async (req, res, next) => {
   let query;
-  //General users can see only their favorites!
-  if (req.user.role !== "admin") {
-    query = Favorite.find({ user: req.user.id }).populate({
-      path: "company",
-      select: "name",
-    });
-  } else {
-    //If you are an admin, you can see all!
-    if (req.params.companyId) {
-      console.log(req.params.companyId);
-      query = Favorite.find({ company: req.params.companyId }).populate({
-        path: "company",
-        select: "name",
-      });
-    } else {
-      query = Favorite.find().populate({
-        path: "company",
-        select: "name",
-      });
-    }
-  }
+
+  //users can see only their favorites
+  query = Favorite.find({ user: req.user.id }).populate({
+    path: "company",
+    select: "name",
+  });
+
   try {
     const favorite = await query;
 

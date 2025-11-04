@@ -10,7 +10,7 @@ const { protect, authorize } = require("../middleware/auth");
 
 router
   .route("/")
-  .get(protect, getFavorites)
+  .get(protect, authorize("user"), getFavorites)
   .post(protect, authorize("user"), createFavorite);
 router.route("/:companyId").delete(protect, authorize("user"), deleteFavorite);
 
