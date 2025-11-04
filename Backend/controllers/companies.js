@@ -6,7 +6,7 @@ const locationService = require('../services/location.service');
 // const Booking = require('../models/Booking');
 
 // @desc    GET all companies
-// @route   GET /api/v1/companies
+// @route   GET /api/companies
 // @access  Public
 exports.getCompanies = async (req, res, next) => {
     let query;
@@ -81,7 +81,7 @@ exports.getCompanies = async (req, res, next) => {
 };
 
 // @desc    GET single Company
-// @route   GET /api/v1/companies/:id
+// @route   GET /api/companies/:id
 // @access  Public
 exports.getCompany = async (req, res, next) => {
     try {
