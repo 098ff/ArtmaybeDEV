@@ -12,9 +12,6 @@ router
   .route("/")
   .get(protect, getFavorites)
   .post(protect, authorize("user"), createFavorite);
-router
-  .route("/:id")
-  .get(protect, getFavorite)
-  .delete(protect, authorize("user"), deleteFavorite);
+router.route("/:companyId").delete(protect, authorize("user"), deleteFavorite);
 
 module.exports = router;
