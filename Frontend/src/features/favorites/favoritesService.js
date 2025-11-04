@@ -1,33 +1,59 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5003/api/v1/favorites';
+const API_URL = 'http://localhost:5003/api/users/me/favorites';
 
-// TODO: Pagination
+const getAuthConfig = () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = user?.token;
+
+    return {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
+};
+
+// GET favorites
 const getFavorites = async () => {
     try {
-        const response = await axios.get(API_URL);
+        const config = getAuthConfig();
+        const response = await axios.get(API_URL, config);
         return response.data;
-    }
-    catch (error) {
-        console.log('favoritesService: getFavorites');
-        throw error;
+    } catch (error) {
+        console.log('favoritesService: getFavorites', error.response?.data);
+        throw error.response?.data || error;
     }
 };
 
-// TODO: Pagination
+// POST favorite
+const createFavorite = async (companyId) => {
+    const body = { companyId };
+    try {
+        const config = getAuthConfig();
+        const response = await axios.post(API_URL, body, config);
+        return response.data;
+    } catch (error) {
+        console.log('favoritesService: createFavorite', error.response?.data);
+        throw error.response?.data || error;
+    }
+};
+
+// DELETE favorite
 const deleteFavorites = async (companyId) => {
     try {
-        const response = await axios.delete(API_URL + "/" + companyId);
+        const config = getAuthConfig();
+        const response = await axios.delete(`${API_URL}/${companyId}`, config);
         return response.data;
-    }
-    catch (error) {
-        console.log('favoritesService: deleteFavorites');
-        throw error;
+    } catch (error) {
+        console.log('favoritesService: deleteFavorites', error.response?.data);
+        throw error.response?.data || error;
     }
 };
 
-const favotiteService = {
+const favoriteService = {
     getFavorites,
+    createFavorite,
     deleteFavorites,
 };
-export default favotiteService;
+
+export default favoriteService;

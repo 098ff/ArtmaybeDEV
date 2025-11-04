@@ -1,6 +1,5 @@
 // Import model for using here!
 const Company = require("../models/Company");
-const User = require("../models/User");
 const Favorite = require("../models/Favorite");
 
 //@desc    Create Favorite
