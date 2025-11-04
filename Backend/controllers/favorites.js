@@ -1,6 +1,5 @@
 // Import model for using here!
 const Company = require("../models/Company");
-const User = require("../models/User");
 const Favorite = require("../models/Favorite");
 
 //@desc    Create Favorite
@@ -111,7 +110,6 @@ exports.getFavorites = async (req, res, next) => {
   //users can see only their favorites
   query = Favorite.find({ user: req.user.id }).populate({
     path: "company",
-    select: "name",
   });
 
   try {

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5003/api/v1/companies';
+const API_URL = 'http://localhost:5003/api/companies';
 
 const getCompanies = async (page = 1, limit = 6) => {
     try {

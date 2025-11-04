@@ -1,35 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from "react-toastify";
 import companyService from '../features/companies/companiesService';
+import favoriteService from '../features/favorites/favoritesService'; 
 import { CompanyCard } from '../components/CompanyCard';
 
 export default function Page() {
     const [companies, setCompanies] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-
     const [page, setPage] = useState(1);
-
     const [hasNextPage, setHasNextPage] = useState(false); 
+    const [favoriteIds, setFavoriteIds] = useState(new Set());
 
-    //   Fetch Data
     useEffect(() => {
-        const fetchCompanies = async () => {
+        const fetchAllData = async () => {
             try {
                 setIsLoading(true);
-                
-                const data = await companyService.getCompanies(page); 
 
-                // Company arr in data.data
-                setCompanies(data.data); 
-                // !! is for define boolean value
-                // True: hasValue || emptyVal
-                // False: undefined || null
-                setHasNextPage(!!data.pagination.next);
+                const companiesPromise = companyService.getCompanies(page);
+                const favoritesPromise = favoriteService.getFavorites(); 
+
+                const [companiesData, favoritesData] = await Promise.all([
+                    companiesPromise,
+                    favoritesPromise
+                ]);
+
+                setCompanies(companiesData.data); 
+                setHasNextPage(!!companiesData.pagination.next);
+  
+                const ids = favoritesData.data.map(fav => fav.company._id);
+                setFavoriteIds(new Set(ids));
                 
                 setError(null);
             } catch (err) {
-                const message = "Failed to fetch companies. Please try again later.";
+                const message = "Failed to fetch data. Please try again later.";
                 setError(message);
                 console.error(err);
             } finally {
@@ -37,8 +41,8 @@ export default function Page() {
             }
         };
 
-        fetchCompanies();
-    }, [page]); 
+        fetchAllData();
+    }, [page]);
 
     //   Checking for Error 
     useEffect(() => {
@@ -47,7 +51,36 @@ export default function Page() {
         }
     }, [error]);
 
-    //   Render .jsx 
+    const handleToggleFavorite = async (companyId, isCurrentlyFavorited) => {
+        try {
+            if (isCurrentlyFavorited) {
+                await favoriteService.deleteFavorites(companyId);
+                
+                setFavoriteIds(prevIds => {
+                    const newIds = new Set(prevIds);
+                    newIds.delete(companyId); 
+                    return newIds;
+                });
+                
+                toast.info("Removed from favorites");
+
+            } else {
+                await favoriteService.createFavorite(companyId);
+
+                setFavoriteIds(prevIds => {
+                    const newIds = new Set(prevIds);
+                    newIds.add(companyId);
+                    return newIds;
+                });
+                
+                toast.success("Added to favorites");
+            }
+        } catch (err) {
+            const message = err.response?.data?.message || "Failed to update favorite";
+            toast.error(message);
+        }
+    };
+
     const renderContent = () => {
         if (isLoading) {
             return <p className="loading-text">Loading companies...</p>;
@@ -59,9 +92,18 @@ export default function Page() {
 
         return (
             <div className="companies-grid">
-                {companies.map((company) => (
-                    <CompanyCard key={company._id} company={company} />
-                ))}
+                {companies.map((company) => {
+                    const isFavorited = favoriteIds.has(company._id);
+
+                    return (
+                        <CompanyCard 
+                            key={company._id} 
+                            company={company} 
+                            isFavorited={isFavorited}
+                            onToggleFavorite={() => handleToggleFavorite(company._id, isFavorited)}
+                        />
+                    );
+                })}
             </div>
         );
     };

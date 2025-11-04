@@ -1,77 +1,67 @@
 import React, { useEffect, useState } from 'react';
-// TODO: Apply it with real data from api
-// import { useSelector, useDispatch } from 'react-redux'; 
+
 import { toast } from 'react-toastify';
-// TODO: Apply it with real data from api
-// import { getFavorites, removeFavorite, reset } from '../features/favorites/favoritesSlice'; 
+import favoriteService from '@/features/favorites/favoritesService';
 import { CompanyCard } from '../components/CompanyCard'; 
 
-// TODO: Remove this after finish fetch from api
-const MOCK_FAVORITES = [
-    {
-        _id: "mock-1",
-        name: "Mock Company Alpha (Test)",
-        description: "This is a mock description for testing the UI.",
-        address: "123 Fake St, Bangkok",
-        telephone: "02-123-4567",
-        website: "httpsa://alpha-test.com"
-    },
-    {
-        _id: "mock-2",
-        name: "Mock Solutions Inc. (Test)",
-        description: "Another mock company to fill up the space.",
-        address: "999 Test Ave, Chiang Mai",
-        telephone: "053-987-6543",
-        website: "httpsa://solutions-test.com"
-    }
-];
-
-
 export default function Page() {
-    // TODO: Apply it with real data from api
-    // const dispatch = useDispatch(); 
-    
-    // TODO: Apply it with real data from api
-    // const { favorites, isLoading, isError, message } = useSelector((state) => state.favorites);
     const [favorites, setFavorites] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isError, setIsError] = useState(false);
     const [message, setMessage] = useState("Mock Error: Failed to fetch!");
 
-
-    // TODO: Apply it with real data from api
+    // Fetch data
     useEffect(() => {
-        setIsLoading(true);
-        
-        // จำลองการโหลดข้อมูล 1 วินาที
-        const timer = setTimeout(() => {
-            if (isError) {
-                setIsLoading(false);
-            } else {
-                setFavorites(MOCK_FAVORITES);
+        const fetchFavorites = async () => {
+            try {
+                setIsLoading(true);
+
+                const data = await favoriteService.getFavorites();
+
+                setFavorites(data.data);
+                setIsError(false);
+                setMessage('');
+            } catch (error) {
+                const errorMessage = 
+                    error.response?.data?.message || 
+                    error.message || 
+                    "Failed to fetch favorites";
+                
+                setIsError(true);
+                setMessage(errorMessage);
+                setFavorites([]);
+            } finally {
                 setIsLoading(false);
             }
-        }, 1000); 
+        };
 
-        return () => clearTimeout(timer);
-    }, [isError]); 
+        fetchFavorites();
+    }, []);
 
     useEffect(() => {
-        if (isError && message) { 
+        if (isError && message) {
             toast.error(message);
         }
     }, [isError, message]);
 
-    const handleToggleFavorite = (companyId) => {
-        // TODO: Apply it with real data from api
-        // dispatch(removeFavorite(companyId));
-        
-        // TODO: Apply it with real data from api
-        setFavorites((currentFavorites) => 
-            currentFavorites.filter(company => company._id !== companyId)
-        );
-        
-        toast.info("Removed from favorites");
+    const handleToggleFavorite = async (companyId) => {
+        try {
+
+            await favoriteService.deleteFavorites(companyId);
+
+            setFavorites((currentFavorites) =>
+                currentFavorites.filter(
+                    (fav) => fav.company._id !== companyId
+                )
+            );
+            
+            toast.info("Removed from favorites");
+        } catch (error) {
+            const errorMessage = 
+                error.response?.data?.message || 
+                "Failed to remove favorite";
+            toast.error(errorMessage);
+        }
     };
 
     const renderContent = () => {
@@ -85,12 +75,12 @@ export default function Page() {
 
         return (
             <div className="companies-grid">
-                {favorites.map((company) => (
+                {favorites.map((favoriteItem) => (
                     <CompanyCard
-                        key={company._id}
-                        company={company}
+                        key={favoriteItem._id}
+                        company={favoriteItem.company}
                         isFavorited={true} 
-                        onToggleFavorite={handleToggleFavorite} 
+                        onToggleFavorite={() => handleToggleFavorite(favoriteItem.company._id)}
                     />
                 ))}
             </div>

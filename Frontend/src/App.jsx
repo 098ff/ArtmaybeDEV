@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Header from './components/Header';
 import Companies from './pages/Companies';
 import Favorites from './pages/Favorites';
+import LoginPage from './pages/Login';
 import { CookiesProvider, useCookies } from 'react-cookie';
 
 const PrivateRoutes = () => {
@@ -18,17 +19,19 @@ const PrivateRoutes = () => {
 function App() {
   return (
     <>
-      {/* This is our Router DOM */}
-      <CookiesProvider>
+      <CookiesProvider> 
         <Router>
           <div>
             <Header />
             <Routes>
-              {/* Given path to each Page */}
+              <Route path='/login' element={<LoginPage />} />
+              
               <Route element={<PrivateRoutes />}>
                 <Route path='/companies' element={<Companies />} />
                 <Route path='/favorites' element={<Favorites />} />
               </Route>
+
+              <Route path='/' element={<Navigate to='/login' />} /> 
             </Routes>
           </div>
         </Router>
@@ -38,5 +41,4 @@ function App() {
   );
 }
 
-// Export for Index.js to use
 export default App;

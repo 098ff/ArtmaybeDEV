@@ -93,4 +93,5 @@ export const favoritesSlice = createSlice({
     }
 });
 
+export const {reset} = favoritesSlice.actions;
 export default favoritesSlice.reducer;
