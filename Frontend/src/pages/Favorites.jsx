@@ -78,7 +78,7 @@ export default function Page() {
                 {favorites.map((favoriteItem) => (
                     <CompanyCard
                         key={favoriteItem._id}
-                        company={favoriteItem}
+                        company={favoriteItem.company}
                         isFavorited={true} 
                         onToggleFavorite={() => handleToggleFavorite(favoriteItem.company._id)}
                     />

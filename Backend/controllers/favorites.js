@@ -110,7 +110,6 @@ exports.getFavorites = async (req, res, next) => {
   //users can see only their favorites
   query = Favorite.find({ user: req.user.id }).populate({
     path: "company",
-    select: "name",
   });
 
   try {

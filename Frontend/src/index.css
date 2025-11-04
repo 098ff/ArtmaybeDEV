@@ -316,6 +316,15 @@ body {
   color: hsl(var(--accent-foreground));
 }
 
+.btn-logout {
+    background-color: transparent;
+    color: #6b7280; 
+}
+.btn-logout:hover {
+    background-color: #fef2f2; 
+    color: #ef4444;
+}
+
 .icon-company {
   height: 1.5rem;
   width: 1.5rem;
@@ -333,6 +342,8 @@ body {
   font-size: 1.5rem;  
   font-weight: bold;
 }
+
+/* ############################# Company & Fav Pages ############################# */
 
 .page-companies {
   display: flex;
@@ -517,4 +528,100 @@ body {
   color: #939298;
   font-weight: 400;
   font-size: 1.25rem;
+}
+
+/* ############################# Login Page ############################# */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 80vh; /* ให้เต็มเกือบทั้งจอ (ไม่รวม Header) */
+  padding: 2rem;
+  background-color: #f4f7f6; /* สีพื้นหลังเทาอ่อน */
+  box-sizing: border-box; /* ป้องกัน padding ทำให้ล้นจอ */
+}
+
+/* --- 2. กล่อง Login --- */
+.login-box {
+  width: 100%;
+  max-width: 450px; /* จำกัดความกว้างสูงสุด */
+  padding: 2.5rem;
+  background-color: #ffffff; /* สีขาว */
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e0e0;
+}
+
+/* --- 3. หัวข้อ --- */
+.login-title {
+  font-size: 2rem; /* 32px */
+  font-weight: 700;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: #222;
+}
+
+.login-subtitle {
+  font-size: 1rem; /* 16px */
+  text-align: center;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+/* --- 4. ฟอร์ม --- */
+.form-group {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box; /* สำคัญมากสำหรับ input */
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #4a90e2; /* สีฟ้าตอน focus */
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+/* --- 5. ปุ่ม --- */
+.login-button {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #4a90e2; /* สีฟ้า */
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.login-button:hover {
+  background-color: #357abd; /* สีฟ้าเข้มขึ้น */
+}
+
+.login-button:active {
+  transform: scale(0.98); /* กดแล้วยุบลงเล็กน้อย */
+}
+
+.login-button:disabled {
+  background-color: #b0c4de; /* สีจางตอนโหลด */
+  cursor: not-allowed;
 }
