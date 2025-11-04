@@ -3,7 +3,6 @@ const router = express.Router({ mergeParams: true });
 const {
   createFavorite,
   deleteFavorite,
-  getFavorite,
   getFavorites,
 } = require("../controllers/favorites");
 const { protect, authorize } = require("../middleware/auth");
