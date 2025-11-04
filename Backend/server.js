@@ -57,9 +57,9 @@ const companies = require("./routes/companies");
 const favorites = require("./routes/favorites");
 
 // TODO: Mount routers
-app.use(`/api/v1/auth`, auth);
-app.use(`/api/v1/companies`, companies);
-app.use(`/api/v1/users/me/favorites`, favorites);
+app.use(`/api/auth`, auth);
+app.use(`/api/companies`, companies);
+app.use(`/api/users/me/favorites`, favorites);
 
 // Use || 5000 for running in window
 const PORT = process.env.PORT || 5000;

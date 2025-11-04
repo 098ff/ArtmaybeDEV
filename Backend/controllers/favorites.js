@@ -4,7 +4,7 @@ const User = require("../models/User");
 const Favorite = require("../models/Favorite");
 
 //@desc    Create Favorite
-//@route   POST /api/v1/users/me/favorites
+//@route   POST /api/me/favorites
 //@access  Private
 exports.createFavorite = async (req, res, next) => {
   try {
@@ -71,7 +71,7 @@ exports.createFavorite = async (req, res, next) => {
 };
 
 //@desc     Delete Favorite
-//@route    DELETE /api/v1/users/me/favorites/:companyId
+//@route    DELETE /api/me/favorites/:companyId
 //@access   Private
 exports.deleteFavorite = async (req, res, next) => {
   try {
@@ -103,7 +103,7 @@ exports.deleteFavorite = async (req, res, next) => {
 };
 
 //@desc     Get all favorites
-//@route    GET /api/v1/users/me/favorites/
+//@route    GET /api/me/favorites/
 //@access   Private
 exports.getFavorites = async (req, res, next) => {
   let query;
