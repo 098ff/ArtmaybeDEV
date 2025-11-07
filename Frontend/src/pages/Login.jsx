@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import authService from '../features/auth/authService';
 
 export default function LoginPage() {
-    const [cookies, setCookie] = useCookies(['token']);
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: '',
@@ -23,27 +21,16 @@ export default function LoginPage() {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
         setIsLoading(true);
 
         try {
             const responseData = await authService.login({ email, password });
 
             if (responseData && responseData.token) {
-  
-                setCookie('token', responseData.token, { 
-                    path: '/', 
-                });
-
-                const userForStorage = {
-                    token: responseData.token,
-                };
-
-                localStorage.setItem('user', JSON.stringify(userForStorage));
-
+                localStorage.setItem('user', JSON.stringify({ token: responseData.token }));
                 toast.success('Login Successful!');
                 navigate('/companies');
-
             } else {
                 toast.error(responseData.message || 'Login failed');
             }
@@ -55,6 +42,7 @@ export default function LoginPage() {
             setIsLoading(false);
         }
     };
+
 
     return (
         <div className="login-container">
@@ -87,9 +75,9 @@ export default function LoginPage() {
                             required
                         />
                     </div>
-                    <button 
-                        type="submit" 
-                        className="login-button" 
+                    <button
+                        type="submit"
+                        className="login-button"
                         disabled={isLoading}
                     >
                         {isLoading ? 'Logging in...' : 'Login'}
