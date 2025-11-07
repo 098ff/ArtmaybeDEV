@@ -16,7 +16,6 @@ const PrivateRoutes = () => {
 function App() {
   return (
     <>
-      {/* <CookiesProvider> */}
         <Router>
           <div>
             <Header />
@@ -32,7 +31,6 @@ function App() {
             </Routes>
           </div>
         </Router>
-      {/* </CookiesProvider> */}
       <ToastContainer />
     </>
   );
