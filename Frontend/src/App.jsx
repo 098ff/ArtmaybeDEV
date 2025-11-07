@@ -6,7 +6,7 @@ import Header from './components/Header';
 import Companies from './pages/Companies';
 import Favorites from './pages/Favorites';
 import LoginPage from './pages/Login';
-import { CookiesProvider, useCookies } from 'react-cookie';
+import { CookiesProvider } from 'react-cookie';
 
 const PrivateRoutes = () => {
   const user = JSON.parse(localStorage.getItem('user'));
