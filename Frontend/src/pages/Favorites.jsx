@@ -1,42 +1,16 @@
-import React, { useEffect, useState } from 'react';
-
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import favoriteService from '@/features/favorites/favoritesService';
+import { getFavorites, removeFavorite } from '@/features/favorites/favoritesSlice';
 import { CompanyCard } from '../components/CompanyCard'; 
 
 export default function Page() {
-    const [favorites, setFavorites] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isError, setIsError] = useState(false);
-    const [message, setMessage] = useState("Mock Error: Failed to fetch!");
+    const dispatch = useDispatch();
+    const { favorites, isLoading, isError, message } = useSelector(state => state.favorites);
 
-    // Fetch data
     useEffect(() => {
-        const fetchFavorites = async () => {
-            try {
-                setIsLoading(true);
-
-                const data = await favoriteService.getFavorites();
-
-                setFavorites(data.data);
-                setIsError(false);
-                setMessage('');
-            } catch (error) {
-                const errorMessage = 
-                    error.response?.data?.message || 
-                    error.message || 
-                    "Failed to fetch favorites";
-                
-                setIsError(true);
-                setMessage(errorMessage);
-                setFavorites([]);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchFavorites();
-    }, []);
+        dispatch(getFavorites());
+    }, [dispatch]);
 
     useEffect(() => {
         if (isError && message) {
@@ -46,20 +20,11 @@ export default function Page() {
 
     const handleToggleFavorite = async (companyId) => {
         try {
-
-            await favoriteService.deleteFavorites(companyId);
-
-            setFavorites((currentFavorites) =>
-                currentFavorites.filter(
-                    (fav) => fav.company._id !== companyId
-                )
-            );
-            
+            // remove favorite
+            await dispatch(removeFavorite(companyId)).unwrap();
             toast.info("Removed from favorites");
         } catch (error) {
-            const errorMessage = 
-                error.response?.data?.message || 
-                "Failed to remove favorite";
+            const errorMessage = error?.message || "Failed to remove favorite";
             toast.error(errorMessage);
         }
     };
@@ -69,7 +34,7 @@ export default function Page() {
             return <p className="loading-text">Loading favorites...</p>;
         }
 
-        if (favorites.length === 0) {
+        if (!favorites || favorites.length === 0) {
             return <p className="no-company-text">You haven't favorited any companies yet.</p>;
         }
 
