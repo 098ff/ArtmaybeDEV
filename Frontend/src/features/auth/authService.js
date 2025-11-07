@@ -7,15 +7,16 @@ const login = async (userData) => {
   const response = await axios.post(API_URL + 'login', userData);
 
   if (response.data) {
-    const stored = {
+    const user = {
       token: response.data.token,
-      name: response.data.name || response.data.user?.name,
+      role: response.data.role || response.data.user?.role,
       raw: response.data
     };
-    localStorage.setItem('user', JSON.stringify(stored));
+    localStorage.setItem('user', JSON.stringify(user));
+    return user; 
   }
 
-  return response.data;
+  return null;
 };
 
 // Logout user
