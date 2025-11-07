@@ -1,22 +1,19 @@
 import React from 'react';
 import { Briefcase, Building2, Heart, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
 import authService from '@/features/auth/authService'; 
 
 function Header() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [cookies, setCookie, removeCookie] = useCookies(['token']);
-
-    const isLoggedIn = !!cookies.token;
+    const user = JSON.parse(localStorage.getItem('user'));
+    const isLoggedIn = !!user?.token;
 
     const isActive = (path) => location.pathname === path;
 
     const handleLogout = () => {
-        authService.logout(); 
-        removeCookie('token', { path: '/' });
+        authService.logout();
         navigate('/login');
     };
 
