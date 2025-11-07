@@ -6,12 +6,31 @@ import Header from './components/Header';
 import Companies from './pages/Companies';
 import Favorites from './pages/Favorites';
 import LoginPage from './pages/Login';
+import { use } from 'react';
 
-const PrivateRoutes = () => {
+const PrivateRoutes = ({ allowedRoles }) => {
   const user = JSON.parse(localStorage.getItem('user'));
   const token = user?.token;
-  return token ? <Outlet /> : <div className='go-login-text'>Please login to start</div>;
+  const role = user?.role;
+
+  console.log(user);
+  console.log(role);
+
+  if (!token) {
+    return <div className='go-login-text'>Please login to start</div>;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    return (
+      <div className='go-login-text'>
+        You are not authorized to access this page.
+      </div>
+    );
+  }
+
+  return <Outlet />;
 };
+
 
 function App() {
   return (
@@ -22,7 +41,7 @@ function App() {
             <Routes>
               <Route path='/login' element={<LoginPage />} />
 
-              <Route element={<PrivateRoutes />}>
+              <Route element={<PrivateRoutes allowedRoles={['user']} />}>
                 <Route path='/companies' element={<Companies />} />
                 <Route path='/favorites' element={<Favorites />} />
               </Route>
