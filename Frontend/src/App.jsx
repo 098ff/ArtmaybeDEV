@@ -10,7 +10,6 @@ import { CookiesProvider, useCookies } from 'react-cookie';
 
 const PrivateRoutes = () => {
   let auth = useCookies(['token'])[0];
-  console.log(auth.token);
   return (
     auth.token !== "" ? <Outlet /> : (<div className='go-login-text'> Please login via Postman</div>)
   )
