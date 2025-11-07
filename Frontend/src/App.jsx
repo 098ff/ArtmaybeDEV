@@ -9,28 +9,27 @@ import LoginPage from './pages/Login';
 import { CookiesProvider, useCookies } from 'react-cookie';
 
 const PrivateRoutes = () => {
-  let auth = useCookies(['token'])[0];
-  return (
-    auth.token !== "" ? <Outlet /> : (<div className='go-login-text'> Please login via Postman</div>)
-  )
-}
+  const user = JSON.parse(localStorage.getItem('user'));
+  const token = user?.token;
+  return token ? <Outlet /> : <div className='go-login-text'>Please login to start</div>;
+};
 
 function App() {
   return (
     <>
-      <CookiesProvider> 
+      <CookiesProvider>
         <Router>
           <div>
             <Header />
             <Routes>
               <Route path='/login' element={<LoginPage />} />
-              
+
               <Route element={<PrivateRoutes />}>
                 <Route path='/companies' element={<Companies />} />
                 <Route path='/favorites' element={<Favorites />} />
               </Route>
 
-              <Route path='/' element={<Navigate to='/login' />} /> 
+              <Route path='/' element={<Navigate to='/login' />} />
             </Routes>
           </div>
         </Router>
