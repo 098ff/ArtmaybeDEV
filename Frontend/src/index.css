@@ -220,9 +220,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem 2.5rem;
+  padding: 1rem 2.5rem;
   border-bottom: 1px solid #e6e6e6;
-  margin-bottom: 1.25rem;
 }
 .header ul {
   display: flex;

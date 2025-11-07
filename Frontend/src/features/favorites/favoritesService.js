@@ -25,35 +25,35 @@ const getFavorites = async () => {
     }
 };
 
-// POST favorite
-const createFavorite = async (companyId) => {
+// POST favorite (add)
+const addFavorite = async (companyId) => {
     const body = { companyId };
     try {
         const config = getAuthConfig();
         const response = await axios.post(API_URL, body, config);
         return response.data;
     } catch (error) {
-        console.log('favoritesService: createFavorite', error.response?.data);
+        console.log('favoritesService: addFavorite', error.response?.data);
         throw error.response?.data || error;
     }
 };
 
-// DELETE favorite
-const deleteFavorites = async (companyId) => {
+// DELETE favorite (remove)
+const removeFavorite = async (companyId) => {
     try {
         const config = getAuthConfig();
         const response = await axios.delete(`${API_URL}/${companyId}`, config);
         return response.data;
     } catch (error) {
-        console.log('favoritesService: deleteFavorites', error.response?.data);
+        console.log('favoritesService: removeFavorite', error.response?.data);
         throw error.response?.data || error;
     }
 };
 
 const favoriteService = {
     getFavorites,
-    createFavorite,
-    deleteFavorites,
+    addFavorite,
+    removeFavorite,
 };
 
 export default favoriteService;

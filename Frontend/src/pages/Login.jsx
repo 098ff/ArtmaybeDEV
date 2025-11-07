@@ -1,45 +1,43 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { login, resetAuthState } from '@/features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import authService from '../features/auth/authService';
 
 export default function LoginPage() {
+    const [form, setForm] = useState({ email: '', password: '' });
+    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-    });
-    const [isLoading, setIsLoading] = useState(false);
 
-    const { email, password } = formData;
+    const auth = useSelector((state) => state.auth);
+    const { user, isLoading, isError, isSuccess, message } = auth;
 
-    const handleChange = (e) => {
-        setFormData((prevState) => ({
-            ...prevState,
-            [e.target.name]: e.target.value,
-        }));
+    useEffect(() => {
+        if (isError && message) {
+            toast.error(message);
+        }
+
+        if (isSuccess && user) {
+            toast.success('Login successful');
+            navigate('/companies');
+        }
+
+        return () => {
+            dispatch(resetAuthState());
+        };
+    }, [isError, isSuccess, message, user, navigate, dispatch]);
+
+    const onChange = (e) => {
+        setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    const handleSubmit = async (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true);
-
         try {
-            const responseData = await authService.login({ email, password });
-
-            if (responseData && responseData.token) {
-                localStorage.setItem('user', JSON.stringify({ token: responseData.token }));
-                toast.success('Login Successful!');
-                navigate('/companies');
-            } else {
-                toast.error(responseData.message || 'Login failed');
-            }
+            await dispatch(login(form)).unwrap();
         } catch (err) {
-            const message = err.response?.data?.message || 'Login failed. Please check your credentials.';
-            toast.error(message);
-            console.error(err);
-        } finally {
-            setIsLoading(false);
+            const msg = err || 'Login failed';
+            toast.error(msg);
         }
     };
 
@@ -52,15 +50,15 @@ export default function LoginPage() {
                     Access your job fair dashboard
                 </p>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={onSubmit}>
                     <div className="form-group">
                         <label htmlFor="email">Email</label>
                         <input
                             type="email"
                             id="email"
                             name="email"
-                            value={email}
-                            onChange={handleChange}
+                            value={form.email}
+                            onChange={onChange}
                             required
                         />
                     </div>
@@ -70,8 +68,8 @@ export default function LoginPage() {
                             type="password"
                             id="password"
                             name="password"
-                            value={password}
-                            onChange={handleChange}
+                            value={form.password}
+                            onChange={onChange}
                             required
                         />
                     </div>

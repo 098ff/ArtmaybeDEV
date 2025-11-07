@@ -52,12 +52,13 @@ export const favoritesSlice = createSlice({
             .addCase(getFavorites.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                state.favorites = action.payload;
+                state.favorites = action.payload?.data || [];
             })
             .addCase(getFavorites.rejected, (state, action) => {
                 state.isLoading = false;
                 state.isError = true;
                 state.message = action.payload;
+                state.favorites = [];
             })
         // ADD Favorite
             .addCase(addFavorite.pending, (state) => {
@@ -66,14 +67,15 @@ export const favoritesSlice = createSlice({
             .addCase(addFavorite.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                state.favorites.push(action.payload); 
+                const newFav = action.payload?.data;
+                if (newFav) state.favorites.push(newFav);
             })
             .addCase(addFavorite.rejected, (state, action) => {
                 state.isLoading = false;
                 state.isError = true;
                 state.message = action.payload;
             })
-        // DELETE Favorite
+        // REMOVE Favorite
             .addCase(removeFavorite.pending, (state) => {
                 state.isLoading = true;
             })
@@ -81,8 +83,7 @@ export const favoritesSlice = createSlice({
                 state.isLoading = false;
                 state.isSuccess = true;
                 state.favorites = state.favorites.filter(
-                    // If dispatch(removeFavorite("id-B")), then action.meta.arg is "id-B"
-                    (company) => company._id !== action.meta.arg
+                    (fav) => fav.company?._id !== action.meta.arg
                 );
             })
             .addCase(removeFavorite.rejected, (state, action) => {
