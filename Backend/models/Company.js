@@ -33,7 +33,6 @@ const CompanySchema = new mongoose.Schema({
         },
         coordinates: {
             type: [Number], // Array of numbers [longitude, latitude]
-            // index: '2dsphere'
         }
     },
 },
