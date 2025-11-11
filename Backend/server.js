@@ -55,11 +55,13 @@ connectDB();
 const auth = require("./routes/auth");
 const companies = require("./routes/companies");
 const favorites = require("./routes/favorites");
+const bookings = require("./routes/bookings");
 
 // TODO: Mount routers
 app.use(`/api/auth`, auth);
 app.use(`/api/companies`, companies);
 app.use(`/api/users/me/favorites`, favorites);
+app.use(`/api/bookings`, bookings);
 
 // Use || 5000 for running in window
 const PORT = process.env.PORT || 5000;
