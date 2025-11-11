@@ -8,6 +8,14 @@ const Booking = require("../models/Booking");
 //@access  Private
 exports.createBooking = async (req, res, next) => {
   try {
+    // Prevent booking if admin
+    if (req.user.role === "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin is not allowed to book interview sessions",
+      });
+    }
+
     //Assign company from URL param
     req.body.company = req.params.companyId;
 
@@ -20,12 +28,26 @@ exports.createBooking = async (req, res, next) => {
       });
     }
 
+    //Check if date is within May 10–13, 2022
+    const interviewDate = new Date(req.body.bookingDate);
+    const startDate = new Date("2022-05-10");
+    const endDate = new Date("2022-05-13");
+
+    if (interviewDate < startDate || interviewDate > endDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Interview date must be between May 10 and May 13, 2022",
+      });
+    }
+
     //Add user to booking
     req.body.user = req.user.id;
 
     //Check for existing bookings
     const existingBookings = await Booking.find({ user: req.user.id });
-    if (existingBookings.length >= 3 && req.user.role !== "admin") {
+
+    // Prevent booking if user already has 3 bookings
+    if (existingBookings.length >= 3) {
       return res.status(400).json({
         success: false,
         message: `The user with ID ${req.user.id} has already made 3 bookings`,
@@ -115,6 +137,18 @@ exports.updateBooking = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: `No booking with the id of ${req.params.id}`,
+      });
+    }
+
+    //Check if date is within May 10–13, 2022
+    const interviewDate = new Date(req.body.bookingDate);
+    const startDate = new Date("2022-05-10");
+    const endDate = new Date("2022-05-13");
+
+    if (interviewDate < startDate || interviewDate > endDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Interview date must be between May 10 and May 13, 2022",
       });
     }
 
