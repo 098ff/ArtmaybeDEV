@@ -5,7 +5,6 @@ participant "«Node.js»\nserver" as Server
 participant "«router»\nbookings" as Router
 participant "«middleware»\nauth" as AuthMW
 participant "«controller»\nbookings" as Ctrl
-participant "«model»\nBooking" as BookingModel
 database "«MongoDB»\nDatabase" as DB
 
 == Api/bookings/:id ==
@@ -23,11 +22,15 @@ AuthMW --> Router : next()
 deactivate AuthMW
 Router -> Ctrl : updateBooking(req, res)
 activate Ctrl
-Ctrl -> DB : Booking.findByIdAndUpdate(id, body)
-activate DB
-DB --> Ctrl : booking
-deactivate DB
-Ctrl --> Client : 200 OK { booking }
+alt body has bookingDate AND date invalid
+  Ctrl --> Client : 400 Bad Request (date out of range)
+else ok
+  Ctrl -> DB : Booking.findByIdAndUpdate(id, body)
+  activate DB
+  DB --> Ctrl : booking
+  deactivate DB
+  Ctrl --> Client : 200 OK { booking }
+end
 deactivate Ctrl
 deactivate Router
 deactivate Server

@@ -3,9 +3,7 @@ title Auth Flow: GET /api/auth/logout
 actor Client
 participant "«Node.js»\nserver" as Server
 participant "«router»\nauth" as Router
-participant "«middleware»\nauth" as AuthMW
 participant "«controller»\nauth" as Ctrl
-participant "«model»\nUser" as UserModel
 database "«MongoDB»\nDatabase" as DB
 
 == Api/auth/Logout ==

@@ -3,7 +3,6 @@ title Auth Flow: POST /api/auth/register
 actor Client
 participant "«Node.js»\nserver" as Server
 participant "«router»\nauth" as Router
-participant "«middleware»\nauth" as AuthMW
 participant "«controller»\nauth" as Ctrl
 participant "«model»\nUser" as UserModel
 database "«MongoDB»\nDatabase" as DB
@@ -17,9 +16,9 @@ Router -> Ctrl : register(req, res)
 activate Ctrl
 Ctrl -> UserModel : User.create(req.body)
 activate UserModel
-UserModel -> DB : insert new User
+UserModel -> DB : insert user
 activate DB
-DB --> UserModel : new User
+DB --> UserModel : new user
 deactivate DB
 deactivate UserModel
 Ctrl -> UserModel : getSignedJwtToken()

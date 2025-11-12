@@ -3,7 +3,6 @@ title Companies Flow: GET /api/companies/:id
 actor Client
 participant "«Node.js»\nserver" as Server
 participant "«router»\ncompanies" as Router
-participant "«middleware»\nauth" as AuthMW
 participant "«controller»\ncompanies" as Ctrl
 participant "«model»\nCompany" as CompanyModel
 database "«MongoDB»\nDatabase" as DB
@@ -17,9 +16,13 @@ Router -> Ctrl : getCompany(req, res)
 activate Ctrl
 Ctrl -> DB : Company.findById(id)
 activate DB
-DB --> Ctrl : company?
+DB --> Ctrl : company or null
 deactivate DB
-Ctrl --> Client : 200 OK { company }
+alt found
+  Ctrl --> Client : 200 OK { company }
+else not found
+  Ctrl --> Client : 404 Not Found
+end
 deactivate Ctrl
 deactivate Router
 deactivate Server

@@ -23,20 +23,40 @@ AuthMW --> Router : next()
 deactivate AuthMW
 Router -> Ctrl : createBooking(req, res)
 activate Ctrl
-Ctrl -> DB : Company.findById(companyId)
-activate DB
-DB --> Ctrl : company?
-deactivate DB
-Ctrl -> DB : Booking.find({ user:req.user.id })
-activate DB
-DB --> Ctrl : existing[]
-deactivate DB
-Ctrl -> Ctrl : check <=3 && role!=admin
-Ctrl -> DB : Booking.create(req.body)
-activate DB
-DB --> Ctrl : booking
-deactivate DB
-Ctrl --> Client : 201 Created { booking }
+alt role == admin
+  Ctrl --> Client : 403 Forbidden (admin cannot book)
+else role != admin
+  Ctrl -> DB : Company.findById(companyId)
+  activate DB
+  DB --> Ctrl : company or null
+  deactivate DB
+  alt company not found
+    Ctrl --> Client : 404 Not Found
+  else company exists
+    Ctrl -> Ctrl : validate bookingDate within May 10–13, 2022
+    alt date invalid
+      Ctrl --> Client : 400 Bad Request (date out of range)
+    else date valid
+      Ctrl -> DB : Booking.find({ user:req.user.id })
+      activate DB
+      DB --> Ctrl : existing[]
+      deactivate DB
+      alt existing.length >= 3
+        Ctrl --> Client : 400 Bad Request (limit reached)
+      else < 3
+        Ctrl -> DB : Booking.create(req.body)
+        activate DB
+        DB --> Ctrl : booking
+        deactivate DB
+        Ctrl -> DB : Booking.findById(booking._id).populate(user, company)
+        activate DB
+        DB --> Ctrl : populatedBooking
+        deactivate DB
+        Ctrl --> Client : 201 Created { data: populatedBooking }
+      end
+    end
+  end
+end
 deactivate Ctrl
 deactivate Router
 deactivate Server

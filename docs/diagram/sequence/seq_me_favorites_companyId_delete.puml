@@ -5,7 +5,6 @@ participant "«Node.js»\nserver" as Server
 participant "«router»\nfavorites" as Router
 participant "«middleware»\nauth" as AuthMW
 participant "«controller»\nfavorites" as Ctrl
-participant "«model»\nFavorite" as FavoriteModel
 database "«MongoDB»\nDatabase" as DB
 
 == Api/me/Favorites/:companyid ==
@@ -27,7 +26,11 @@ Ctrl -> DB : Favorite.findOneAndDelete({ user, companyId })
 activate DB
 DB --> Ctrl : deleted?
 deactivate DB
-Ctrl --> Client : 200 OK { success:true }
+alt found
+  Ctrl --> Client : 200 OK { success:true }
+else not found
+  Ctrl --> Client : 404 Not Found
+end
 deactivate Ctrl
 deactivate Router
 deactivate Server

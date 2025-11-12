@@ -27,19 +27,27 @@ Ctrl -> DB : Company.findById(body.companyId)
 activate DB
 DB --> Ctrl : company?
 deactivate DB
-Ctrl -> DB : Favorite.findOne({ user, company })
-activate DB
-DB --> Ctrl : existed?
-deactivate DB
-Ctrl -> DB : Favorite.create({ user, company })
-activate DB
-DB --> Ctrl : favorite
-deactivate DB
-Ctrl -> DB : Favorite.findById(favorite._id).populate('company')
-activate DB
-DB --> Ctrl : populatedFavorite
-deactivate DB
-Ctrl --> Client : 201/200 { duplicate, data }
+alt company not found
+  Ctrl --> Client : 404 Not Found
+else company exists
+  Ctrl -> DB : Favorite.findOne({ user, company })
+  activate DB
+  DB --> Ctrl : existed?
+  deactivate DB
+  alt existed
+    Ctrl --> Client : 200 OK { duplicate:true, data: existed }
+  else not existed
+    Ctrl -> DB : Favorite.create({ user, company })
+    activate DB
+    DB --> Ctrl : favorite
+    deactivate DB
+    Ctrl -> DB : Favorite.findById(favorite._id).populate('company')
+    activate DB
+    DB --> Ctrl : populatedFavorite
+    deactivate DB
+    Ctrl --> Client : 201 Created { duplicate:false, data: populatedFavorite }
+  end
+end
 deactivate Ctrl
 deactivate Router
 deactivate Server
