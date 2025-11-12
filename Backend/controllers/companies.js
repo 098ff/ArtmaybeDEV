@@ -2,8 +2,7 @@
 const Company = require('../models/Company');
 const User = require('../models/User');
 const locationService = require('../services/location.service');
-// TODO : Implement Booking model for populate Booking info into Company info
-// const Booking = require('../models/Booking');
+const Booking = require('../models/Booking');
 
 // @desc    GET all companies
 // @route   GET /api/companies
@@ -22,9 +21,9 @@ exports.getCompanies = async (req, res, next) => {
     let queryStr = JSON.stringify(reqQuery);
 
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
-    // TODO : Finding resources when populate (If booking is done you the commented code instead)
-    // query = Company.find(JSON.parse(queryStr)).populate(`bookings`); // Convert back into Object for send to find()
-    query = Company.find(JSON.parse(queryStr));
+    query = Company.find(JSON.parse(queryStr)).populate(
+        'bookings'
+    ); // Convert back into Object for send to find()
 
     // Select Fields
     if (req.query.select) {
@@ -85,7 +84,9 @@ exports.getCompanies = async (req, res, next) => {
 // @access  Public
 exports.getCompany = async (req, res, next) => {
     try {
-        const company = await Company.findById(req.params.id);
+        const company = await Company.findById(req.params.id).populate(
+            'bookings'
+        );
 
         if (!company) {
             return res.status(400).json({ success: false });
