@@ -3,6 +3,7 @@ title Favorites Flow: DELETE /api/me/favorites/:companyId
 actor Client
 participant "«Node.js»\nserver" as Server
 participant "«router»\nfavorites" as Router
+participant "«middleware»\nauth" as AuthMW
 participant "«controller»\nfavorites" as Ctrl
 participant "«model»\nFavorite" as FavoriteModel
 database "«MongoDB»\nDatabase" as DB
@@ -10,8 +11,16 @@ database "«MongoDB»\nDatabase" as DB
 == Api/me/Favorites/:companyid ==
 Client -> Server : DELETE /api/me/favorites/:companyId
 activate Server
-Server -> Router : router.delete('/me/favorites/:companyId', deleteFavorite)
+Server -> Router : router.delete('/me/favorites/:companyId', protect, deleteFavorite)
 activate Router
+Router -> AuthMW : protect(req, res, next)
+activate AuthMW
+AuthMW -> DB : verify JWT / load user
+activate DB
+DB --> AuthMW : user / ok
+deactivate DB
+AuthMW --> Router : next()
+deactivate AuthMW
 Router -> Ctrl : deleteFavorite(req, res)
 activate Ctrl
 Ctrl -> DB : Favorite.findOneAndDelete({ user, companyId })

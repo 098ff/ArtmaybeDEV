@@ -3,6 +3,7 @@ title Bookings Flow: POST /api/companies/:companyId/bookings
 actor Client
 participant "«Node.js»\nserver" as Server
 participant "«router»\nbookings" as Router
+participant "«middleware»\nauth" as AuthMW
 participant "«controller»\nbookings" as Ctrl
 participant "«model»\nBooking" as BookingModel
 database "«MongoDB»\nDatabase" as DB
@@ -10,8 +11,16 @@ database "«MongoDB»\nDatabase" as DB
 == Api/companies/:companyid/Bookings ==
 Client -> Server : POST /api/companies/:companyId/bookings
 activate Server
-Server -> Router : router.post('/api/companies/:companyId/bookings', createBooking)
+Server -> Router : router.post('/companies/:companyId/bookings', protect, createBooking)
 activate Router
+Router -> AuthMW : protect(req, res, next)
+activate AuthMW
+AuthMW -> DB : verify JWT / load user
+activate DB
+DB --> AuthMW : user / ok
+deactivate DB
+AuthMW --> Router : next()
+deactivate AuthMW
 Router -> Ctrl : createBooking(req, res)
 activate Ctrl
 Ctrl -> DB : Company.findById(companyId)

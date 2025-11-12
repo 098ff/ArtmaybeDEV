@@ -3,6 +3,7 @@ title Companies Flow: GET /api/companies/:id
 actor Client
 participant "«Node.js»\nserver" as Server
 participant "«router»\ncompanies" as Router
+participant "«middleware»\nauth" as AuthMW
 participant "«controller»\ncompanies" as Ctrl
 participant "«model»\nCompany" as CompanyModel
 database "«MongoDB»\nDatabase" as DB

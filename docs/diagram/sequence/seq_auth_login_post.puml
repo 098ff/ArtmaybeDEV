@@ -3,6 +3,7 @@ title Auth Flow: POST /api/auth/login
 actor Client
 participant "«Node.js»\nserver" as Server
 participant "«router»\nauth" as Router
+participant "«middleware»\nauth" as AuthMW
 participant "«controller»\nauth" as Ctrl
 participant "«model»\nUser" as UserModel
 database "«MongoDB»\nDatabase" as DB
@@ -10,7 +11,7 @@ database "«MongoDB»\nDatabase" as DB
 == Api/auth/Login ==
 Client -> Server : POST /api/auth/login
 activate Server
-Server -> Router : router.post('/login', login)
+Server -> Router : router.post('/auth/login', login)
 activate Router
 Router -> Ctrl : login(req, res)
 activate Ctrl

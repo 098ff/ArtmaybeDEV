@@ -3,6 +3,7 @@ title Auth Flow: POST /api/auth/me
 actor Client
 participant "«Node.js»\nserver" as Server
 participant "«router»\nauth" as Router
+participant "«middleware»\nauth" as AuthMW
 participant "«controller»\nauth" as Ctrl
 participant "«model»\nUser" as UserModel
 database "«MongoDB»\nDatabase" as DB
@@ -10,8 +11,16 @@ database "«MongoDB»\nDatabase" as DB
 == Api/auth/Me ==
 Client -> Server : POST /api/auth/me
 activate Server
-Server -> Router : router.post('/me', getMe)
+Server -> Router : router.post('/auth/me', protect, getMe)
 activate Router
+Router -> AuthMW : protect(req, res, next)
+activate AuthMW
+AuthMW -> DB : verify JWT / load user
+activate DB
+DB --> AuthMW : user / ok
+deactivate DB
+AuthMW --> Router : next()
+deactivate AuthMW
 Router -> Ctrl : getMe(req, res)
 activate Ctrl
 Ctrl -> UserModel : User.findById(req.user.id)

@@ -3,6 +3,7 @@ title Companies Flow: GET /api/companies/search/dist
 actor Client
 participant "«Node.js»\nserver" as Server
 participant "«router»\ncompanies" as Router
+participant "«middleware»\nauth" as AuthMW
 participant "«controller»\ncompanies" as Ctrl
 participant "«model»\nCompany" as CompanyModel
 database "«MongoDB»\nDatabase" as DB
@@ -10,12 +11,16 @@ database "«MongoDB»\nDatabase" as DB
 == Api/companies/Search/Dist ==
 Client -> Server : GET /api/companies/search/dist
 activate Server
-Server -> Router : router.get('/companies/search/dist', getCompaniesbyDistance)
+Server -> Router : router.get('/companies/search/dist', protect, getCompaniesbyDistance)
 activate Router
-Router -> Ctrl : protect(req, res, next)
-activate Ctrl
-Ctrl --> Router : next()
-deactivate Ctrl
+Router -> AuthMW : protect(req, res, next)
+activate AuthMW
+AuthMW -> DB : verify JWT / load user
+activate DB
+DB --> AuthMW : user / ok
+deactivate DB
+AuthMW --> Router : next()
+deactivate AuthMW
 Router -> Ctrl : getCompaniesbyDistance(req, res)
 activate Ctrl
 Ctrl -> DB : Company.aggregate(geo query)
