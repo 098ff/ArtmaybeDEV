@@ -1,0 +1,23 @@
+@startuml
+title Auth Flow: GET /api/auth/logout
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\nauth" as Router
+participant "«controller»\nauth" as Ctrl
+participant "«model»\nUser" as UserModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/auth/Logout ==
+Client -> Server : GET /api/auth/logout
+activate Server
+Server -> Router : router.get('/logout', logout)
+activate Router
+Router -> Ctrl : logout(req, res)
+activate Ctrl
+Ctrl -> Ctrl : clear cookie token
+Ctrl --> Client : 200 OK { success:true }
+deactivate Ctrl
+deactivate Router
+deactivate Server
+== Api/auth/Logout ==
+@enduml

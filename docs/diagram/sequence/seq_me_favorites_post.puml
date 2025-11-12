@@ -1,0 +1,38 @@
+@startuml
+title Favorites Flow: POST /api/me/favorites
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\nfavorites" as Router
+participant "«controller»\nfavorites" as Ctrl
+participant "«model»\nFavorite" as FavoriteModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/me/Favorites ==
+Client -> Server : POST /api/me/favorites
+activate Server
+Server -> Router : router.post('/me/favorites', createFavorite)
+activate Router
+Router -> Ctrl : createFavorite(req, res)
+activate Ctrl
+Ctrl -> DB : Company.findById(body.companyId)
+activate DB
+DB --> Ctrl : company?
+deactivate DB
+Ctrl -> DB : Favorite.findOne({ user, company })
+activate DB
+DB --> Ctrl : existed?
+deactivate DB
+Ctrl -> DB : Favorite.create({ user, company })
+activate DB
+DB --> Ctrl : favorite
+deactivate DB
+Ctrl -> DB : Favorite.findById(favorite._id).populate('company')
+activate DB
+DB --> Ctrl : populatedFavorite
+deactivate DB
+Ctrl --> Client : 201/200 { duplicate, data }
+deactivate Ctrl
+deactivate Router
+deactivate Server
+== Api/me/Favorites ==
+@enduml

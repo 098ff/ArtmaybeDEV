@@ -1,0 +1,102 @@
+@startuml
+skinparam classAttributeIconSize 0
+class "JobFairService" as Application_407481 <<Application>> {
+  /api
+}
+class "Auth" as Resource_7269918 <<Resource>> {
+  +Paths /auth
+  +GET /auth/logout
+  +POST /auth/login
+  +POST /auth/me
+  +POST /auth/register
+}
+class "/auth" as Path_2938939 <<Path>> {
+}
+class "Bookings" as Resource_6359558 <<Resource>> {
+  +Paths /bookings
+  +DELETE /bookings/:id
+  +GET /bookings
+  +POST /companies/:companyId/bookings
+  +PUT /bookings/:id
+}
+class "/bookings" as Path_8975772 <<Path>> {
+}
+class "Favorites" as Resource_1746619 <<Resource>> {
+  +Paths /me/favorites
+  +DELETE /me/favorites/:companyId
+  +GET /me/favorites/
+  +POST /me/favorites
+}
+class "/me/favorites" as Path_9610477 <<Path>> {
+}
+
+class "Companies" as Resource_9001001 <<Resource>> {
+  +Paths /companies
+  +GET /companies
+  +GET /companies/:id
+  +GET /companies/search/dist
+}
+class "/companies" as Path_9001002 <<Path>> {
+}
+
+class "UserModel" as Representation_2276632 <<Representation>> {
+  - name: String
+  - telephone: String
+  - email: String
+  - password: String
+  - role: String
+  - address: String
+  - location: GeoJSON
+  - createdAt: Date
+}
+class "CompanyModel" as Representation_5577844 <<Representation>> {
+  - name: String
+  - address: String
+  - website: String
+  - email: String
+  - phone: String
+  - location: GeoJSON
+}
+class "BookingModel" as Representation_6013023 <<Representation>> {
+  - bookingDate: Date
+  - user: ObjectId(User)
+  - company: ObjectId(Company)
+  - status: String
+}
+class "FavoriteModel" as Representation_2501927 <<Representation>> {
+  - user: ObjectId(User)
+  - company: ObjectId(Company)
+  - createdAt: Date
+}
+class "AuthMiddleware" as Middleware_138351 <<Middleware>> {
+  +protect(req, res, next): void
+  +authorize(...roles): Function
+}
+Application_407481 ..> Path_2938939
+Path_2938939 ..> Resource_7269918
+Application_407481 ..> Path_8975772
+Path_8975772 ..> Resource_6359558
+Application_407481 ..> Path_9610477
+Path_9610477 ..> Resource_1746619
+
+Application_407481 ..> Path_9001002
+Path_9001002 ..> Resource_9001001
+
+Application_407481 ..> Resource_7269918 : uses
+Resource_7269918 ..> Representation_2276632 : uses
+
+Application_407481 ..> Resource_6359558 : uses
+Resource_6359558 ..> Representation_6013023 : uses
+Resource_6359558 ..> Representation_5577844 : uses
+Middleware_138351 ..> Resource_6359558 : protects, res, next
+
+Application_407481 ..> Resource_1746619 : uses
+Resource_1746619 ..> Representation_2501927 : uses
+Middleware_138351 ..> Resource_1746619 : protects, res, next
+
+Application_407481 ..> Resource_9001001 : uses
+Resource_9001001 ..> Representation_5577844 : uses
+Middleware_138351 ..> Resource_9001001 : protects (search/dist only)
+
+Representation_5577844 ..> Representation_6013023 : hosts
+@enduml

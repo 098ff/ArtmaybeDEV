@@ -1,0 +1,30 @@
+@startuml
+title Bookings Flow: DELETE /api/bookings/:id
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\nbookings" as Router
+participant "«controller»\nbookings" as Ctrl
+participant "«model»\nBooking" as BookingModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/bookings/:id ==
+Client -> Server : DELETE /api/bookings/:id
+activate Server
+Server -> Router : router.delete('/bookings/:id', deleteBooking)
+activate Router
+Router -> Ctrl : deleteBooking(req, res)
+activate Ctrl
+Ctrl -> DB : Booking.findById(id)
+activate DB
+DB --> Ctrl : booking?
+deactivate DB
+Ctrl -> DB : booking.remove()
+activate DB
+DB --> Ctrl : deleted
+deactivate DB
+Ctrl --> Client : 200 OK { success:true }
+deactivate Ctrl
+deactivate Router
+deactivate Server
+== Api/bookings/:id ==
+@enduml

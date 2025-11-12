@@ -1,0 +1,26 @@
+@startuml
+title Bookings Flow: PUT /api/bookings/:id
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\nbookings" as Router
+participant "«controller»\nbookings" as Ctrl
+participant "«model»\nBooking" as BookingModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/bookings/:id ==
+Client -> Server : PUT /api/bookings/:id
+activate Server
+Server -> Router : router.put('/bookings/:id', updateBooking)
+activate Router
+Router -> Ctrl : updateBooking(req, res)
+activate Ctrl
+Ctrl -> DB : Booking.findByIdAndUpdate(id, body)
+activate DB
+DB --> Ctrl : booking
+deactivate DB
+Ctrl --> Client : 200 OK { booking }
+deactivate Ctrl
+deactivate Router
+deactivate Server
+== Api/bookings/:id ==
+@enduml

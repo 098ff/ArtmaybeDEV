@@ -1,0 +1,30 @@
+@startuml
+title Auth Flow: POST /api/auth/login
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\nauth" as Router
+participant "«controller»\nauth" as Ctrl
+participant "«model»\nUser" as UserModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/auth/Login ==
+Client -> Server : POST /api/auth/login
+activate Server
+Server -> Router : router.post('/login', login)
+activate Router
+Router -> Ctrl : login(req, res)
+activate Ctrl
+Ctrl -> UserModel : User.findOne({ email })
+activate UserModel
+UserModel --> Ctrl : user?
+deactivate UserModel
+Ctrl -> UserModel : matchPassword(password)
+activate UserModel
+UserModel --> Ctrl : true/false
+deactivate UserModel
+Ctrl --> Client : 200 OK + Token
+deactivate Ctrl
+deactivate Router
+deactivate Server
+== Api/auth/Login ==
+@enduml

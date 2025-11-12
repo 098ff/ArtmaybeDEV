@@ -1,0 +1,26 @@
+@startuml
+title Companies Flow: GET /api/companies
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\ncompanies" as Router
+participant "«controller»\ncompanies" as Ctrl
+participant "«model»\nCompany" as CompanyModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/companies ==
+Client -> Server : GET /api/companies
+activate Server
+Server -> Router : router.get('/companies', getCompanies)
+activate Router
+Router -> Ctrl : getCompanies(req, res)
+activate Ctrl
+Ctrl -> DB : Company.find({})
+activate DB
+DB --> Ctrl : companies[]
+deactivate DB
+Ctrl --> Client : 200 OK { count, data }
+deactivate Ctrl
+deactivate Router
+deactivate Server
+== Api/companies ==
+@enduml

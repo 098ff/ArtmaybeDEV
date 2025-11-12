@@ -1,0 +1,35 @@
+@startuml
+title Bookings Flow: POST /api/companies/:companyId/bookings
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\nbookings" as Router
+participant "«controller»\nbookings" as Ctrl
+participant "«model»\nBooking" as BookingModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/companies/:companyid/Bookings ==
+Client -> Server : POST /api/companies/:companyId/bookings
+activate Server
+Server -> Router : router.post('/api/companies/:companyId/bookings', createBooking)
+activate Router
+Router -> Ctrl : createBooking(req, res)
+activate Ctrl
+Ctrl -> DB : Company.findById(companyId)
+activate DB
+DB --> Ctrl : company?
+deactivate DB
+Ctrl -> DB : Booking.find({ user:req.user.id })
+activate DB
+DB --> Ctrl : existing[]
+deactivate DB
+Ctrl -> Ctrl : check <=3 && role!=admin
+Ctrl -> DB : Booking.create(req.body)
+activate DB
+DB --> Ctrl : booking
+deactivate DB
+Ctrl --> Client : 201 Created { booking }
+deactivate Ctrl
+deactivate Router
+deactivate Server
+== Api/companies/:companyid/Bookings ==
+@enduml

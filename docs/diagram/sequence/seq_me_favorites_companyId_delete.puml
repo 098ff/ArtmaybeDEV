@@ -1,0 +1,26 @@
+@startuml
+title Favorites Flow: DELETE /api/me/favorites/:companyId
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\nfavorites" as Router
+participant "«controller»\nfavorites" as Ctrl
+participant "«model»\nFavorite" as FavoriteModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/me/Favorites/:companyid ==
+Client -> Server : DELETE /api/me/favorites/:companyId
+activate Server
+Server -> Router : router.delete('/me/favorites/:companyId', deleteFavorite)
+activate Router
+Router -> Ctrl : deleteFavorite(req, res)
+activate Ctrl
+Ctrl -> DB : Favorite.findOneAndDelete({ user, companyId })
+activate DB
+DB --> Ctrl : deleted?
+deactivate DB
+Ctrl --> Client : 200 OK { success:true }
+deactivate Ctrl
+deactivate Router
+deactivate Server
+== Api/me/Favorites/:companyid ==
+@enduml
