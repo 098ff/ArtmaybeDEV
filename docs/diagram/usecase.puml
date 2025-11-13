@@ -10,30 +10,49 @@ actor Admin
 User <|-- Reg
 
 rectangle "Service" {
-  usecase "Login \n<b>POST /api/auth/login" as UC_Login
-  usecase "Register \n<b>POST /api/auth/register" as UC_Register
-  usecase "Logout \n<b>GET /api/auth/logout" as UC_Logout
-  usecase "get Me \n<b>GET /api/me" as UC_GetMe
 
-  usecase "Book Interview Session \n<b>POST /api/companies/{companyId}/bookings" as UC_Book
-  usecase "View Own Bookings \n<b>GET /api/bookings" as UC_ViewOwn
-  usecase "Edit Own Booking\n<b>PUT /api/bookings/{id}" as UC_EditOwn
-  usecase "Delete Own Booking\n<b>DELETE /api/bookings/{id}" as UC_DeleteOwn
+  package "Auth" {
+    usecase "Login \n<b>POST /api/auth/login" as UC_Login
+    usecase "Register \n<b>POST /api/auth/register" as UC_Register
+    usecase "Logout \n<b>GET /api/auth/logout" as UC_Logout
+    usecase "get Me \n<b>GET /api/auth/me" as UC_GetMe
+  }
+  
+  package "Company" {
+    usecase "View Company List \n<b>GET /api/companies" as UC_Companies
+    usecase "View Company Detail \n<b>GET /api/companies/{id}" as UC_CompanyDetail
+    usecase "Search Companies by Distance \n<b>GET /api/companies/search/dist" as UC_CompanyDist
+  }
+  ' User
+  package "Booking" {
 
-  usecase "View Company List \n<b>GET /api/companies" as UC_Companies
-  usecase "View Company Detail \n<b>GET /api/companies/{id}" as UC_CompanyDetail
-  usecase "Search Companies by Distance \n<b>GET /api/companies/search/dist" as UC_CompanyDist
+    package "Booking (User)" {
+      usecase "Book Interview Session \n<b>POST /api/companies/{companyId}/bookings" as UC_Book
+      usecase "View Own Bookings \n<b>GET /api/bookings" as UC_ViewOwn
+      usecase "View Own Booking Detail \n<b>GET /api/bookings/{id}" as UC_ViewOwnDetail
+      usecase "Edit Own Booking\n<b>PUT /api/bookings/{id}" as UC_EditOwn
+      usecase "Delete Own Booking\n<b>DELETE /api/bookings/{id}" as UC_DeleteOwn
+    }
 
-  usecase "Add Favorite \n<b>POST /api/me/favorites" as UC_FavAdd
-  usecase "View Favorites \n<b>GET /api/me/favorites/" as UC_FavList
-  usecase "Remove Favorite \n<b>DELETE /api/me/favorites/{companyId}" as UC_FavDel
+    package "Booking (Admin)" { 
+      usecase "View Any Booking \n<b>GET /api/bookings" as UC_ViewAny
+      usecase "View Any Booking Detail \n<b>GET /api/bookings/{id}" as UC_ViewAnyDetail
+      usecase "Edit Any Booking \n<b>PUT /api/bookings/{id}" as UC_EditAny
+      usecase "Delete Any Booking \n<b>DELETE /api/bookings/{id}" as UC_DeleteAny
+    }
+  }
 
-  usecase "View Any Booking \n<b>GET /api/bookings" as UC_ViewAny
-  usecase "Edit Any Booking \n<b>PUT /api/bookings/{id}" as UC_EditAny
-  usecase "Delete Any Booking \n<b>DELETE /api/bookings/{id}" as UC_DeleteAny
+
+  package "Favorite" {
+    usecase "Add Favorite \n<b>POST /api/users/me/favorites" as UC_FavAdd
+    usecase "View Favorites \n<b>GET /api/users/me/favorites/" as UC_FavList
+    usecase "View Favorite Detail \n<b>GET /api/users/me/favorites/{id}" as UC_FavDetail
+    usecase "Remove Favorite \n<b>DELETE /api/users/me/favorites/{companyId}" as UC_FavDel
+  }
+
+  'admin
 }
 
-' Associations
 User --> UC_Login
 User --> UC_Register
 User --> UC_Logout
@@ -51,28 +70,36 @@ Reg --> UC_CompanyDist
 Reg --> UC_FavAdd
 Reg --> UC_FavList
 Reg --> UC_FavDel
+Reg --> UC_FavDetail
+Reg --> UC_ViewOwnDetail
 
+Admin --> UC_GetMe
 Admin --> UC_ViewAny
 Admin --> UC_EditAny
 Admin --> UC_DeleteAny
 Admin --> UC_Companies
 Admin --> UC_CompanyDetail
 Admin --> UC_CompanyDist
+Admin --> UC_ViewAnyDetail
 
-' Notes / Constraints
 note right of UC_Book
-  Limited to 3 bookings max
+  Limited to 3 bookings max per user
   Admin cannot book
+  Booking date must be between 
+  May 10 and May 13, 2022
 end note
 
 note right of UC_Companies
   Company info includes:
   - name, address, website
-  - email, phone
+  - description, telephone
   - location (GeoJSON)
 end note
 
 note right of UC_FavAdd
-  If already favorited -> returns existing with duplicate=true
+  If user already favorited 
+  -> returns existing with 
+     duplicate=true
 end note
+
 @enduml
