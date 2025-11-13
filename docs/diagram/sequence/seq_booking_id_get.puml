@@ -1,0 +1,48 @@
+@startuml
+title Bookings Flow: GET /api/bookings/:id
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\nbookings" as Router
+participant "«middleware»\nauth" as AuthMW
+participant "«controller»\nbookings" as Ctrl
+participant "«model»\nBooking" as BookingModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/bookings/:id ==
+Client -> Server : GET /api/bookings/:id
+activate Server
+Server -> Router : router.get('/bookings/:id', protect, getBooking)
+activate Router
+
+Router -> AuthMW : protect(req, res, next)
+activate AuthMW
+AuthMW -> DB : verify JWT / load user
+activate DB
+DB --> AuthMW : user
+deactivate DB
+
+alt valid token
+  AuthMW --> Router : next()
+else invalid or missing token
+  AuthMW --> Client : 401 Unauthorized
+end
+deactivate AuthMW
+
+Router -> Ctrl : getBooking(req, res)
+activate Ctrl
+Ctrl -> BookingModel : Booking.findById(req.params.id)
+activate BookingModel
+BookingModel --> Ctrl : booking or null
+deactivate BookingModel
+
+alt booking found
+  Ctrl --> Client : 200 OK { success:true, data:booking }
+else not found
+  Ctrl --> Client : 404 Not Found { success:false, message }
+end
+
+deactivate Ctrl
+deactivate Router
+deactivate Server
+== Api/bookings/:id ==
+@enduml

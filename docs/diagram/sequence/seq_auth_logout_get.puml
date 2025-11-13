@@ -10,13 +10,13 @@ database "«MongoDB»\nDatabase" as DB
 Client -> Server : GET /api/auth/logout
 activate Server
 Server -> Router : router.get('/auth/logout', logout)
+deactivate Server
 activate Router
 Router -> Ctrl : logout(req, res)
-activate Ctrl
-Ctrl -> Ctrl : clear cookie token
-Ctrl --> Client : 200 OK { success:true }
-deactivate Ctrl
 deactivate Router
-deactivate Server
+activate Ctrl
+Ctrl -> Ctrl : clear cookie "token"
+Ctrl --> Client : 200 OK { success:true, data:{} }
+deactivate Ctrl
 == Api/auth/Logout ==
 @enduml

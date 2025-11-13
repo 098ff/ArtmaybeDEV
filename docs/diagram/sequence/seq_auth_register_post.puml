@@ -11,23 +11,31 @@ database "«MongoDB»\nDatabase" as DB
 Client -> Server : POST /api/auth/register
 activate Server
 Server -> Router : router.post('/auth/register', register)
+deactivate Server
 activate Router
+
 Router -> Ctrl : register(req, res)
+deactivate Router
 activate Ctrl
-Ctrl -> UserModel : User.create(req.body)
+
+Ctrl -> Ctrl : extract name, email, password, role, address, location
+
+Ctrl -> UserModel : User.create({ ... })
 activate UserModel
-UserModel -> DB : insert user
+UserModel -> DB : insert new user
 activate DB
 DB --> UserModel : new user
 deactivate DB
+UserModel --> Ctrl : user
 deactivate UserModel
-Ctrl -> UserModel : getSignedJwtToken()
+
+Ctrl -> UserModel : user.getSignedJwtToken()
 activate UserModel
-UserModel --> Ctrl : jwt token
+UserModel --> Ctrl : token
 deactivate UserModel
-Ctrl --> Client : 201 Created + Token
+
+Ctrl --> Client : 200 OK { success:true, token ,role:user.role }
+
 deactivate Ctrl
-deactivate Router
-deactivate Server
 == Api/auth/Register ==
 @enduml

@@ -11,30 +11,57 @@ database "«MongoDB»\nDatabase" as DB
 Client -> Server : POST /api/auth/login
 activate Server
 Server -> Router : router.post('/auth/login', login)
+deactivate Server
 activate Router
 Router -> Ctrl : login(req, res)
+deactivate Router
 activate Ctrl
-Ctrl -> UserModel : User.findOne({ email })
+Ctrl -> Ctrl : extract email, password
+
+alt missing email or password
+  Ctrl --> Client : 400 Bad Request { success:false, msg:"Please provide email and password" }
+else continue
+end
+
+Ctrl -> UserModel : User.findOne({ email }).select('+password')
 activate UserModel
+UserModel -> DB : query user by email
+activate DB
+DB --> UserModel : user or null
+deactivate DB
 UserModel --> Ctrl : user or null
 deactivate UserModel
-alt user found
-  Ctrl -> UserModel : matchPassword(password)
-  activate UserModel
-  UserModel --> Ctrl : true/false
-  deactivate UserModel
-  alt valid password
-    Ctrl -> UserModel : getSignedJwtToken()
-    activate UserModel
-    UserModel --> Ctrl : jwt token
-    deactivate UserModel
-    Ctrl --> Client : 200 OK + Token
-  else invalid password
-    Ctrl --> Client : 401 Unauthorized
-  end
-else user not found
-  Ctrl --> Client : 401 Unauthorized
+
+alt user not found
+  Ctrl --> Client : 400 Bad Request { success:false, msg:"Invalid credentials" }
+  deactivate Router
+  deactivate Server
+else continue
 end
+
+Ctrl -> UserModel : user.matchPassword(password)
+activate UserModel
+UserModel -> DB : compare hashed password
+activate DB
+DB --> UserModel : isMatch
+deactivate DB
+UserModel --> Ctrl : isMatch
+deactivate UserModel
+
+alt invalid password
+  Ctrl --> Client : 401 Unauthorized { success:false, msg:"Invalid credentials" }
+  deactivate Router
+  deactivate Server
+else continue
+end
+
+Ctrl -> UserModel : user.getSignedJwtToken()
+activate UserModel
+UserModel --> Ctrl : token
+deactivate UserModel
+
+Ctrl --> Client : 200 OK { success:true, token }
+
 deactivate Ctrl
 deactivate Router
 deactivate Server
