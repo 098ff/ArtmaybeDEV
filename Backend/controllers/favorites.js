@@ -3,7 +3,7 @@ const Company = require("../models/Company");
 const Favorite = require("../models/Favorite");
 
 //@desc    Create Favorite
-//@route   POST /api/me/favorites
+//@route   POST /api/users/me/favorites
 //@access  Private
 exports.createFavorite = async (req, res, next) => {
   try {
@@ -70,7 +70,7 @@ exports.createFavorite = async (req, res, next) => {
 };
 
 //@desc     Delete Favorite
-//@route    DELETE /api/me/favorites/:companyId
+//@route    DELETE /api/users/me/favorites/:companyId
 //@access   Private
 exports.deleteFavorite = async (req, res, next) => {
   try {
@@ -102,7 +102,7 @@ exports.deleteFavorite = async (req, res, next) => {
 };
 
 //@desc     Get all favorites
-//@route    GET /api/me/favorites/
+//@route    GET /api/users/me/favorites/
 //@access   Private
 exports.getFavorites = async (req, res, next) => {
   let query;
