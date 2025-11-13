@@ -102,7 +102,7 @@ exports.deleteFavorite = async (req, res, next) => {
 };
 
 //@desc     Get all favorites
-//@route    GET /api/users/me/favorites/
+//@route    GET /api/users/me/favorites
 //@access   Private
 exports.getFavorites = async (req, res, next) => {
   let query;
@@ -125,5 +125,44 @@ exports.getFavorites = async (req, res, next) => {
     return res
       .status(500)
       .json({ success: false, message: "Cannot find your Favorite company" });
+  }
+};
+
+//@desc     Get single favorite
+//@route    GET /api/users/me/favorites/:id
+//@access   Private
+exports.getFavorite = async (req, res, next) => {
+  try {
+    const favorite = await Favorite.findById(req.params.id)
+      .populate({
+        path: "company",
+        select: "name address telephone",
+      })
+      .populate({ path: "user", select: "name email telephone" });
+
+    if (!favorite) {
+      return res.status(404).json({
+        success: false,
+        message: `No favorite found for ${req.params.id}`,
+      });
+    }
+
+    //check ownership
+    if (favorite.user._id.toString() !== req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: `User ${req.user.id} is not authorized to access this favorite`,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: favorite,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot find Favorite" });
   }
 };

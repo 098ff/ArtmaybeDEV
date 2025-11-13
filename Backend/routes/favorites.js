@@ -4,6 +4,7 @@ const {
   createFavorite,
   deleteFavorite,
   getFavorites,
+  getFavorite,
 } = require("../controllers/favorites");
 const { protect, authorize } = require("../middleware/auth");
 
@@ -12,5 +13,6 @@ router
   .get(protect, authorize("user"), getFavorites)
   .post(protect, authorize("user"), createFavorite);
 router.route("/:companyId").delete(protect, authorize("user"), deleteFavorite);
+router.route("/:id").get(protect, authorize("user"), getFavorite);
 
 module.exports = router;
