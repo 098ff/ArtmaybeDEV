@@ -5,36 +5,69 @@ participant "«Node.js»\nserver" as Server
 participant "«router»\nbookings" as Router
 participant "«middleware»\nauth" as AuthMW
 participant "«controller»\nbookings" as Ctrl
+participant "«model»\nBooking" as BookingModel
 database "«MongoDB»\nDatabase" as DB
 
 == Api/bookings/:id ==
 Client -> Server : DELETE /api/bookings/:id
 activate Server
 Server -> Router : router.delete('/bookings/:id', protect, deleteBooking)
+deactivate Server
 activate Router
-Router -> AuthMW : protect(req, res, next)
+
+Router -> AuthMW : prot ect(req, res, next)
 activate AuthMW
 AuthMW -> DB : verify JWT / load user
 activate DB
-DB --> AuthMW : user / ok
+DB --> AuthMW : user or null
 deactivate DB
-AuthMW --> Router : next()
-deactivate AuthMW
-Router -> Ctrl : deleteBooking(req, res)
-activate Ctrl
-Ctrl -> DB : Booking.findById(id)
-activate DB
-DB --> Ctrl : booking or null
-deactivate DB
-alt not found
-  Ctrl --> Client : 404 Not Found
-else found
-  Ctrl -> DB : booking.remove()
-  activate DB
-  DB --> Ctrl : deleted
-  deactivate DB
-  Ctrl --> Client : 200 OK { success:true }
+
+alt valid token
+  AuthMW --> Router : next()
+else invalid or missing token
+  AuthMW --> Client : 401 Unauthorized
+  deactivate AuthMW
 end
+deactivate AuthMW
+
+Router -> Ctrl : deleteBooking(req, res)
+deactivate Router
+activate Ctrl
+
+Ctrl -> BookingModel : Booking.findById(req.params.id)
+activate BookingModel
+BookingModel -> DB : query booking by id
+activate DB
+DB --> BookingModel : booking or null
+deactivate DB
+BookingModel --> Ctrl : booking or null
+deactivate BookingModel
+
+alt booking not found
+  Ctrl --> Client : 404 Not Found { success:false, message:`No booking with the id of ${req.params.id}` }
+  deactivate Router
+  deactivate Server
+else continue
+end
+
+alt booking.user != req.user.id AND req.user.role !== "admin"
+  Ctrl --> Client : 401 Unauthorized { success:false, message:`User ${req.user.id} is not authorized to delete this booking` }
+  deactivate Router
+  deactivate Server
+else continue
+end
+
+Ctrl -> BookingModel : booking.deleteOne()
+activate BookingModel
+BookingModel -> DB : delete booking
+activate DB
+DB --> BookingModel : (deleted)
+deactivate DB
+BookingModel --> Ctrl : (deleted)
+deactivate BookingModel
+
+Ctrl --> Client : 200 OK { success:true, data:{} }
+
 deactivate Ctrl
 deactivate Router
 deactivate Server
