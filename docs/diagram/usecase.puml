@@ -18,13 +18,13 @@ rectangle "Service" {
     usecase "get Me \n<b>GET /api/auth/me" as UC_GetMe
   }
   
-  package "Company" {
+  package "Companies" {
     usecase "View Company List \n<b>GET /api/companies" as UC_Companies
     usecase "View Company Detail \n<b>GET /api/companies/{id}" as UC_CompanyDetail
     usecase "Search Companies by Distance \n<b>GET /api/companies/search/dist" as UC_CompanyDist
   }
   ' User
-  package "Booking" {
+  package "Bookings" {
       usecase "Book Interview Session \n<b>POST /api/companies/{companyId}/bookings" as UC_Book
       usecase "View Own Bookings \n<b>GET /api/bookings" as UC_ViewOwn
       usecase "View Own Booking Detail \n<b>GET /api/bookings/{id}" as UC_ViewOwnDetail
@@ -36,7 +36,7 @@ rectangle "Service" {
   }
 
 
-  package "Favorite" {
+  package "Favorites" {
     usecase "Add Favorite \n<b>POST /api/users/me/favorites" as UC_FavAdd
     usecase "View Favorites \n<b>GET /api/users/me/favorites/" as UC_FavList
     usecase "View Favorite Detail \n<b>GET /api/users/me/favorites/{id}" as UC_FavDetail
@@ -55,7 +55,6 @@ Reg --> UC_GetMe
 Reg --> UC_Book
 Reg --> UC_ViewOwn
 Reg --> UC_EditOwn
-Reg --> UC_DeleteOwn
 Reg --> UC_Companies
 Reg --> UC_CompanyDetail
 Reg --> UC_CompanyDist
