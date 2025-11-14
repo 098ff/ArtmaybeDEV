@@ -9,11 +9,11 @@ const {
 } = require("../controllers/bookings");
 const { protect, authorize } = require("../middleware/auth");
 
-router.route("/").get(protect, getBookings).post(protect, createBooking);
+router.route("/").get(protect, getBookings).post(protect, authorize('user'), createBooking);
 router
   .route("/:id")
   .get(protect, getBooking)
-  .put(protect, updateBooking)
-  .delete(protect, deleteBooking);
+  .put(protect, authorize('admin', 'user'), updateBooking)
+  .delete(protect, authorize('admin', 'user'), deleteBooking);
 
 module.exports = router;

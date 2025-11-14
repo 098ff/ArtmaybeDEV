@@ -8,14 +8,6 @@ const Booking = require("../models/Booking");
 //@access  Private
 exports.createBooking = async (req, res, next) => {
   try {
-    // Prevent booking if admin
-    if (req.user.role === "admin") {
-      return res.status(403).json({
-        success: false,
-        message: "Admin is not allowed to book interview sessions",
-      });
-    }
-
     //Assign company from URL param
     req.body.company = req.params.companyId;
 
