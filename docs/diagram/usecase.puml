@@ -25,21 +25,14 @@ rectangle "Service" {
   }
   ' User
   package "Booking" {
-
-    package "Booking (User)" {
       usecase "Book Interview Session \n<b>POST /api/companies/{companyId}/bookings" as UC_Book
       usecase "View Own Bookings \n<b>GET /api/bookings" as UC_ViewOwn
       usecase "View Own Booking Detail \n<b>GET /api/bookings/{id}" as UC_ViewOwnDetail
       usecase "Edit Own Booking\n<b>PUT /api/bookings/{id}" as UC_EditOwn
-      usecase "Delete Own Booking\n<b>DELETE /api/bookings/{id}" as UC_DeleteOwn
-    }
-
-    package "Booking (Admin)" { 
       usecase "View Any Booking \n<b>GET /api/bookings" as UC_ViewAny
       usecase "View Any Booking Detail \n<b>GET /api/bookings/{id}" as UC_ViewAnyDetail
       usecase "Edit Any Booking \n<b>PUT /api/bookings/{id}" as UC_EditAny
       usecase "Delete Any Booking \n<b>DELETE /api/bookings/{id}" as UC_DeleteAny
-    }
   }
 
 
@@ -50,7 +43,6 @@ rectangle "Service" {
     usecase "Remove Favorite \n<b>DELETE /api/users/me/favorites/{companyId}" as UC_FavDel
   }
 
-  'admin
 }
 
 User --> UC_Login

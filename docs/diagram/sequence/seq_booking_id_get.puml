@@ -12,34 +12,51 @@ database "«MongoDB»\nDatabase" as DB
 Client -> Server : GET /api/bookings/:id
 activate Server
 Server -> Router : router.get('/bookings/:id', protect, getBooking)
+deactivate Server
 activate Router
 
 Router -> AuthMW : protect(req, res, next)
 activate AuthMW
 AuthMW -> DB : verify JWT / load user
 activate DB
-DB --> AuthMW : user
+DB --> AuthMW : user or null
 deactivate DB
 
 alt valid token
   AuthMW --> Router : next()
 else invalid or missing token
   AuthMW --> Client : 401 Unauthorized
+  deactivate AuthMW
 end
-deactivate AuthMW
 
 Router -> Ctrl : getBooking(req, res)
+deactivate Router
 activate Ctrl
-Ctrl -> BookingModel : Booking.findById(req.params.id)
+
+Ctrl -> BookingModel : Booking.findById(req.params.id).populate(company,user)
 activate BookingModel
+BookingModel -> DB : query booking by id
+activate DB
+DB --> BookingModel : booking or null
+deactivate DB
 BookingModel --> Ctrl : booking or null
 deactivate BookingModel
 
-alt booking found
-  Ctrl --> Client : 200 OK { success:true, data:booking }
-else not found
-  Ctrl --> Client : 404 Not Found { success:false, message }
+alt booking not found
+  Ctrl --> Client : 404 Not Found { success:false, message:`No booking with the id of ${req.params.id}` }
+  deactivate Router
+  deactivate Server
+else continue
 end
+
+alt user is not owner AND not admin
+  Ctrl --> Client : 401 Unauthorized { success:false, message:`User ${req.user.id} is not authorized to access this booking` }
+  deactivate Router
+  deactivate Server
+else continue
+end
+
+Ctrl --> Client : 200 OK { success:true, data:booking }
 
 deactivate Ctrl
 deactivate Router
