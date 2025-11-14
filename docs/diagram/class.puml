@@ -1,0 +1,88 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class "JobFairService" as App <<Application>> {
+  /api
+}
+
+class "Auth" as AuthResource <<Resource>> {
+  +Paths /api/auth
+  --
+  +POST register(name, telephone, email, password, role, address, location): User
+  +POST login(email, password): Token
+  +GET logout(): void
+  +GET getMe(): User
+}
+
+class "Bookings" as BookingResource <<Resource>> {
+  +Paths /api/bookings
+  +Paths /api/companies/{companyId}/bookings
+  --
+  +GET getBookings(): Booking[]
+  +GET getBooking(id): Booking
+  +POST addBooking(companyId): Booking
+  +PUT updateBooking(id): Booking
+  +DELETE deleteBooking(id): void
+}
+
+class "Companies" as CompanyResource <<Resource>> {
+  +Paths /api/companies
+  --
+  +GET getCompanies(): Company[]
+  +GET getCompany(id): Company
+}
+
+class "UserModel" as UserRep <<Representation>> {
+  - id: ObjectId
+  - name: String
+  - telephone: String
+  - email: String
+  - password: String
+  - role: String
+  - address: String
+  - location: GeoJSON
+  - createdAt: Date
+}
+
+class "CompanyModel" as CompanyRep <<Representation>> {
+  - id: ObjectId
+  - name: String
+  - address: String
+  - website: String
+  - description: String
+  - telephone: String
+  - location: GeoJSON
+}
+
+class "BookingModel" as BookingRep <<Representation>> {
+  - id: ObjectId
+  - user: ObjectId<User>
+  - company: ObjectId<Company>
+  - bookingDate: Date
+  - status: String
+  - createdAt: Date
+}
+
+
+class "AuthMiddleware" as AuthMW <<Middleware>> {
+  +protect(req, res, next): void
+  +authorize(...roles): Function
+}
+
+App ..> AuthResource    : uses
+App ..> BookingResource : uses
+App ..> CompanyResource : uses
+
+AuthResource    ..> UserRep    : uses
+BookingResource ..> BookingRep : uses
+BookingResource ..> CompanyRep : uses
+CompanyResource ..> CompanyRep : uses
+
+AuthMW ..> AuthResource    : protects
+AuthMW ..> BookingResource : protects
+AuthMW ..> CompanyResource : protects
+
+BookingRep "0..*" -down- UserRep    : user
+BookingRep "0..*" -down- CompanyRep : company
+
+@enduml

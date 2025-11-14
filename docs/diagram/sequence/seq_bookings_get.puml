@@ -1,0 +1,90 @@
+@startuml
+title Bookings Flow: GET /api/bookings
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\nbookings" as Router
+participant "«middleware»\nauth" as AuthMW
+participant "«controller»\nbookings" as Ctrl
+participant "«model»\nBooking" as BookingModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/bookings ==
+Client -> Server : GET /api/bookings
+activate Server
+Server -> Router : router.get('/bookings', protect, getBookings)
+deactivate Server
+activate Router
+
+Router -> AuthMW : protect(req, res, next)
+
+activate AuthMW
+AuthMW -> DB : verify JWT / load user
+activate DB
+DB --> AuthMW : user or null
+deactivate DB
+
+alt valid token
+  AuthMW --> Router : next()
+else invalid or missing token
+  AuthMW --> Client : 401 Unauthorized
+  deactivate AuthMW
+end
+
+Router -> Ctrl : getBookings(req, res)
+deactivate Router
+activate Ctrl
+
+' ---- กรณี user ปกติ (ไม่ใช่ admin) ----
+alt req.user.role !== "admin"
+  Ctrl -> BookingModel : Booking.find({ user:req.user.id }).populate(company,user)
+  activate BookingModel
+  BookingModel -> DB : query bookings by user
+  activate DB
+  DB --> BookingModel : bookings[]
+  deactivate DB
+  BookingModel --> Ctrl : bookings[]
+  deactivate BookingModel
+
+  Ctrl --> Client : 200 OK { success:true, count:bookings.length, data:bookings }
+  deactivate Server
+else continue
+end
+
+' ---- กรณี admin + filter ตาม companyId ----
+alt req.user.role === "admin" AND req.params.companyId
+  Ctrl -> BookingModel : Booking.find({ company:req.params.companyId }).populate(company,user)
+  activate BookingModel
+  BookingModel -> DB : query bookings by company
+  activate DB
+  DB --> BookingModel : bookings[]
+  deactivate DB
+  BookingModel --> Ctrl : bookings[]
+  deactivate BookingModel
+
+  Ctrl --> Client : 200 OK { success:true, count:bookings.length, data:bookings }
+  deactivate Router
+  deactivate Server
+else continue
+end
+
+' ---- กรณี admin + ไม่ได้ส่ง companyId ----
+alt req.user.role === "admin" AND no companyId
+  Ctrl -> BookingModel : Booking.find().populate(company,user)
+  activate BookingModel
+  BookingModel -> DB : query all bookings
+  activate DB
+  DB --> BookingModel : bookings[]
+  deactivate DB
+  BookingModel --> Ctrl : bookings[]
+  deactivate BookingModel
+
+  Ctrl --> Client : 200 OK { success:true, count:bookings.length, data:bookings }
+  deactivate Ctrl
+else continue
+end
+
+deactivate Ctrl
+deactivate Router
+deactivate Server
+== Api/bookings ==
+@enduml

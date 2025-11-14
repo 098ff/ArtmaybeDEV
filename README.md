@@ -176,6 +176,7 @@ Here are the main API endpoints available. (🔒 = Authentication Required)
 | Method   | Endpoint                       | Description                                |
 |:---------|:-------------------------------|:-------------------------------------------|
 | `GET`    | `/me/favorites`                | Get the current user's favorite companies. |
+| `GET`    | `/me/favorites/:id`            | Get details for a specific favorite. |
 | `POST`   | `/me/favorites`                | Add a company to favorites.                |
 | `DELETE` | `/me/favorites/:companyId`     | Remove a company from favorites.           |
 
@@ -183,6 +184,7 @@ Here are the main API endpoints available. (🔒 = Authentication Required)
 | Method   | Endpoint           | Description                                |
 |:---------|:-------------------|:-------------------------------------------|
 | `GET`    | `/`                | Get all bookings (for admin) or own bookings (for user). |
+| `GET`    | `/:id`             | Get details for a specific bookings    |
 | `POST`   | `/`                | Create a new interview booking.            |
 | `PUT`    | `/:id`             | Update a booking.                          |
 | `DELETE` | `/:id`             | Delete a booking.                          |

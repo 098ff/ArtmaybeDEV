@@ -1,0 +1,41 @@
+@startuml
+title Auth Flow: POST /api/auth/register
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\nauth" as Router
+participant "«controller»\nauth" as Ctrl
+participant "«model»\nUser" as UserModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/auth/Register ==
+Client -> Server : POST /api/auth/register
+activate Server
+Server -> Router : router.post('/auth/register', register)
+deactivate Server
+activate Router
+
+Router -> Ctrl : register(req, res)
+deactivate Router
+activate Ctrl
+
+Ctrl -> Ctrl : extract name, telephone, email, password, role, address, location
+
+Ctrl -> UserModel : User.create({ ... })
+activate UserModel
+UserModel -> DB : insert new user
+activate DB
+DB --> UserModel : new user
+deactivate DB
+UserModel --> Ctrl : user
+deactivate UserModel
+
+Ctrl -> UserModel : user.getSignedJwtToken()
+activate UserModel
+UserModel --> Ctrl : token
+deactivate UserModel
+
+Ctrl --> Client : 200 OK { success:true, token ,role:user.role }
+
+deactivate Ctrl
+== Api/auth/Register ==
+@enduml

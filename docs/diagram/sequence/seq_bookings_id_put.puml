@@ -1,0 +1,94 @@
+@startuml
+title Bookings Flow: PUT /api/bookings/:id
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\nbookings" as Router
+participant "«middleware»\nauth" as AuthMW
+participant "«controller»\nbookings" as Ctrl
+participant "«model»\nBooking" as BookingModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/bookings/:id ==
+Client -> Server : PUT /api/bookings/:id
+activate Server
+Server -> Router : router.put('/bookings/:id', protect, updateBooking)
+deactivate Server
+activate Router
+
+Router -> AuthMW : protect(req, res, next)
+activate AuthMW
+AuthMW -> DB : verify JWT / load user
+activate DB
+DB --> AuthMW : user or null
+deactivate DB
+
+alt valid token
+  AuthMW --> Router : next()
+else invalid or missing token
+  AuthMW --> Client : 401 Unauthorized
+  deactivate AuthMW
+end
+deactivate AuthMW
+
+Router -> Ctrl : updateBooking(req, res)
+deactivate Router
+activate Ctrl
+
+Ctrl -> BookingModel : Booking.findById(req.params.id)
+activate BookingModel
+BookingModel -> DB : query booking by id
+activate DB
+DB --> BookingModel : booking or null
+deactivate DB
+BookingModel --> Ctrl : booking or null
+deactivate BookingModel
+
+alt booking not found
+  Ctrl --> Client : 404 Not Found { success:false, message:`No booking with the id of ${req.params.id}` }
+  deactivate Router
+  deactivate Server
+else continue
+end
+
+' ---- เช็คช่วงวันที่ ----
+Ctrl -> Ctrl : set interviewDate, startDate, endDate
+
+alt (interviewDate < startDate) OR (interviewDate > endDate)
+  Ctrl --> Client : 400 Bad Request { success:false, message:"Interview date must be between May 10 and May 13, 2022" }
+  deactivate Router
+  deactivate Server
+else continue
+end
+
+' ---- เช็ค owner ----
+alt booking.user != req.user.id AND req.user.role !== "admin"
+  Ctrl --> Client : 401 Unauthorized { success:false, message:`User ${req.user.id} is not authorized to update this booking` }
+  deactivate Router
+  deactivate Server
+else continue
+end
+
+' ---- เช็ค status: อัปเดตได้เฉพาะ admin ----
+alt req.body.status exists AND req.user.role !== "admin"
+  Ctrl --> Client : 401 Unauthorized { success:false, message:"Only admin can update the status" }
+  deactivate Router
+  deactivate Server
+else continue
+end
+
+Ctrl -> BookingModel : Booking.findByIdAndUpdate(req.params.id, req.body, { new:true, runValidators:true })
+activate BookingModel
+BookingModel -> DB : update booking
+activate DB
+DB --> BookingModel : updated booking
+deactivate DB
+BookingModel --> Ctrl : booking
+deactivate BookingModel
+
+Ctrl --> Client : 200 OK { success:true, data:booking }
+
+deactivate Ctrl
+deactivate Router
+deactivate Server
+== Api/bookings/:id ==
+@enduml

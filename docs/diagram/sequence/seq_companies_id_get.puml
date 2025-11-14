@@ -1,0 +1,41 @@
+@startuml
+title Companies Flow: GET /api/companies/:id
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\ncompanies" as Router
+participant "«controller»\ncompanies" as Ctrl
+participant "«model»\nCompany" as CompanyModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/companies/:id ==
+Client -> Server : GET /api/companies/:id
+activate Server
+Server -> Router : router.get('/companies/:id', getCompany)
+deactivate Server
+activate Router
+
+Router -> Ctrl : getCompany(req, res)
+deactivate Router
+activate Ctrl
+
+Ctrl -> CompanyModel : Company.findById(req.params.id).populate('bookings')
+activate CompanyModel
+CompanyModel -> DB : query company by id
+activate DB
+DB --> CompanyModel : company or null
+deactivate DB
+CompanyModel --> Ctrl : company or null
+deactivate CompanyModel
+
+alt company not found
+  Ctrl --> Client : 400 Bad Request { success:false }
+  deactivate Router
+  deactivate Server
+else continue
+end
+
+Ctrl --> Client : 200 OK { success:true, data:company }
+
+deactivate Ctrl
+== Api/companies/:id ==
+@enduml

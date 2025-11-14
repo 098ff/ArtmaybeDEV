@@ -1,0 +1,51 @@
+@startuml
+title Auth Flow: GET /api/auth/me
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\nauth" as Router
+participant "«middleware»\nauth" as AuthMW
+participant "«controller»\nauth" as Ctrl
+participant "«model»\nUser" as UserModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/auth/Me ==
+Client -> Server : GET /api/auth/me
+activate Server
+Server -> Router : router.get('/auth/me', protect, getMe)
+deactivate Server
+activate Router
+
+Router -> AuthMW : protect(req, res, next)
+activate AuthMW
+AuthMW -> DB : verify JWT / load user
+activate DB
+DB --> AuthMW : user or null
+deactivate DB
+
+alt valid token
+  AuthMW --> Router : next()
+else invalid or missing token
+  AuthMW --> Client : 401 Unauthorized
+  deactivate AuthMW
+end
+
+Router -> Ctrl : getMe(req, res)
+deactivate Router
+activate Ctrl
+
+Ctrl -> UserModel : User.findById(req.user.id)
+activate UserModel
+UserModel -> DB : query by id
+activate DB
+DB --> UserModel : user
+deactivate DB
+UserModel --> Ctrl : user
+deactivate UserModel
+
+Ctrl --> Client : 200 OK { success:true, data:user }
+
+deactivate Ctrl
+deactivate Router
+deactivate Server
+== Api/auth/Me ==
+@enduml

@@ -126,6 +126,47 @@ exports.getBookings = async (req, res, next) => {
   }
 };
 
+//@desc     Get single booking
+//@route    GET /api/bookings/:id
+//@access   Private
+exports.getBooking = async (req, res, next) => {
+  try {
+    const booking = await Booking.findById(req.params.id)
+      .populate({
+        path: "company",
+        select: "name address telephone",
+      })
+      .populate({ path: "user", select: "name email telephone" });
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: `No booking with the id of ${req.params.id}`,
+      });
+    }
+
+    //check ownership
+    if (
+      booking.user._id.toString() !== req.user.id && req.user.role !== "admin"
+    ) {
+      return res.status(401).json({
+        success: false,
+        message: `User ${req.user.id} is not authorized to access this booking`,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: booking,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot find Booking" });
+  }
+};
+
 //@desc     Update booking
 //@route    PUT /api/bookings/:id
 //@access   Private
