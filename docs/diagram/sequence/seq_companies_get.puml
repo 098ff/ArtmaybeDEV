@@ -11,16 +11,34 @@ database "«MongoDB»\nDatabase" as DB
 Client -> Server : GET /api/companies
 activate Server
 Server -> Router : router.get('/companies', getCompanies)
-activate Router
-Router -> Ctrl : getCompanies(req, res)
-activate Ctrl
-Ctrl -> DB : Company.find(query).select().sort().skip().limit()
-activate DB
-DB --> Ctrl : companies[]
-deactivate DB
-Ctrl --> Client : 200 OK { count, data }
-deactivate Ctrl
-deactivate Router
 deactivate Server
+activate Router
+
+Router -> Ctrl : getCompanies(req, res)
+deactivate Router
+activate Ctrl
+
+Ctrl -> Ctrl : copy req.query to reqQuery
+Ctrl -> Ctrl : remove select/sort/page/limit
+Ctrl -> Ctrl : build queryStr with gt/gte/lt/lte/in
+
+Ctrl -> CompanyModel : Company.find(JSON.parse(queryStr)).populate('bookings')
+activate CompanyModel
+CompanyModel -> DB : query companies
+activate DB
+DB --> CompanyModel : companies (query object)
+deactivate DB
+CompanyModel --> Ctrl : companies query
+deactivate CompanyModel
+
+Ctrl -> Ctrl : apply select/sort/page/limit
+Ctrl -> Ctrl : calc startIndex/endIndex/page/limit
+Ctrl -> Ctrl : build pagination object
+
+Ctrl -> Ctrl : execute query (await companies)
+
+Ctrl --> Client : 200 OK { success:true, count, pagination, data:companies }
+
+deactivate Ctrl
 == Api/companies ==
 @enduml
