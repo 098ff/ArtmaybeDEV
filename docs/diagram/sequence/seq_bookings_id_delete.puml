@@ -26,9 +26,17 @@ alt valid token
   AuthMW --> Router : next()
 else invalid or missing token
   AuthMW --> Client : 401 Unauthorized
+end
+
+Router -> AuthMW : authorize('admin', 'user')(req, res, next)
+
+alt role allowed
+  AuthMW --> Router : next()
+  deactivate Server
+else role NOT in roles
+  AuthMW --> Client : 403 Forbidden { success:false, message: "User role <role> is not authorized" }
   deactivate AuthMW
 end
-deactivate AuthMW
 
 Router -> Ctrl : deleteBooking(req, res)
 deactivate Router

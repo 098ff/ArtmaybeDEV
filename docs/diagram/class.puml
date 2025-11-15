@@ -69,9 +69,9 @@ class "AuthMiddleware" as AuthMW <<Middleware>> {
   +authorize(...roles): Function
 }
 
-App ..> AuthResource    : uses
-App ..> BookingResource : uses
-App ..> CompanyResource : uses
+App ..> AuthResource   
+App ..> BookingResource 
+App ..> CompanyResource 
 
 AuthResource    ..> UserRep    : uses
 BookingResource ..> BookingRep : uses
@@ -79,8 +79,7 @@ BookingResource ..> CompanyRep : uses
 CompanyResource ..> CompanyRep : uses
 
 AuthMW ..> AuthResource    : protects
-AuthMW ..> BookingResource : protects
-AuthMW ..> CompanyResource : protects
+AuthMW ..> BookingResource : protects / authorize
 
 BookingRep "0..*" -down- UserRep    : user
 BookingRep "0..*" -down- CompanyRep : company

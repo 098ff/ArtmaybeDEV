@@ -26,9 +26,17 @@ alt valid token
   AuthMW --> Router : next()
 else invalid or missing token
   AuthMW --> Client : 401 Unauthorized
+end
+
+Router -> AuthMW : authorize('admin', 'user')(req, res, next)
+
+alt role allowed
+  AuthMW --> Router : next()
+  deactivate Server
+else role NOT in roles
+  AuthMW --> Client : 403 Forbidden { success:false, message: "User role <role> is not authorized" }
   deactivate AuthMW
 end
-deactivate AuthMW
 
 Router -> Ctrl : updateBooking(req, res)
 deactivate Router
@@ -68,7 +76,6 @@ alt booking.user != req.user.id AND req.user.role !== "admin"
 else continue
 end
 
-' ---- เช็ค status: อัปเดตได้เฉพาะ admin ----
 alt req.body.status exists AND req.user.role !== "admin"
   Ctrl --> Client : 401 Unauthorized { success:false, message:"Only admin can update the status" }
   deactivate Router

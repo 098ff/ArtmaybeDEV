@@ -27,20 +27,21 @@ alt valid token
   AuthMW --> Router : next()
 else invalid or missing token
   AuthMW --> Client : 401 Unauthorized
+end
+
+Router -> AuthMW : authorize('user')(req, res, next)
+
+alt role allowed
+  AuthMW --> Router : next()
+  deactivate Server
+else role NOT in roles
+  AuthMW --> Client : 403 Forbidden { success:false, message: "User role <role> is not authorized" }
   deactivate AuthMW
 end
-deactivate AuthMW
 
 Router -> Ctrl : createBooking(req, res)
 deactivate Router
 activate Ctrl
-
-' ---- ห้าม admin จอง ----
-alt req.user.role === "admin"
-  Ctrl --> Client : 403 Forbidden { success:false, message:"Admin is not allowed to book interview sessions" }
-  deactivate Server
-else continue
-end
 
 Ctrl -> Ctrl : req.body.company = req.params.companyId
 
