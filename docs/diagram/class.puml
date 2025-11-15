@@ -79,8 +79,7 @@ BookingResource ..> CompanyRep : uses
 CompanyResource ..> CompanyRep : uses
 
 AuthMW ..> AuthResource    : protects
-AuthMW ..> BookingResource : protects
-AuthMW ..> CompanyResource : protects
+AuthMW ..> BookingResource : protects / authorize
 
 BookingRep "0..*" -down- UserRep    : user
 BookingRep "0..*" -down- CompanyRep : company
