@@ -32,7 +32,9 @@ In addition to the core requirements, this project includes advanced features su
 
 -   **User Authentication**: Secure user registration and login using JWT (JSON Web Tokens).
 -   **Interview Booking**: Users can book, view, edit, and delete up to 3 interview sessions.
--   **Admin Capabilities**: Admins can view, edit, and delete all user bookings.
+-   **Admin Capabilities**: 
+    -   Admins can view, edit, and delete all user bookings.
+    -   Admins can add, edit, delete company data.
 -   **Company Search**:
     -   View a list of participating companies.
     -   **[Extra]** Search for companies within a specific distance (e.g., within 10 km).
@@ -69,6 +71,7 @@ ArtmaybeDEV/
 │   ├── 📁 src/
 │   │   ├── config/
 │   │   ├── controllers/
+│   │   ├── data/
 │   │   ├── middleware/
 │   │   ├── models/
 │   │   ├── routes/
@@ -83,6 +86,7 @@ ArtmaybeDEV/
     │   ├── assets/
     │   ├── components/
     │   ├── features/
+    │   ├── lib/
     │   ├── pages/
     │   ├── App.css
     │   ├── App.jsx
@@ -170,7 +174,10 @@ Here are the main API endpoints available. (🔒 = Authentication Required)
 |:-------|:---------------------|:----------------------------------------------|
 | `GET`  | `/`                  | Get a list of all companies.                  |
 | `GET`  | `/:id`               | Get details for a specific company.           |
-| `GET`  | `/search/dist`        | Search for companies by distance.             |
+| `POST` | `/`                  | Create a new company (🔒).                    |
+| `PUT`  | `/:id`               | Update a company (🔒).                        |
+| `DELETE`| `/:id`              | Delete a company (🔒).                        |
+| `GET`  | `/search/dist`       | Search for companies by distance (🔒).        |
 
 #### **User Favorites (🔒) (`/api/users`)**
 | Method   | Endpoint                       | Description                                |
