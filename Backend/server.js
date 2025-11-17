@@ -51,13 +51,13 @@ app.use(cors());
 
 connectDB();
 
-// TODO: Route files
+// Route files
 const auth = require("./routes/auth");
 const companies = require("./routes/companies");
 const favorites = require("./routes/favorites");
 const bookings = require("./routes/bookings");
 
-// TODO: Mount routers
+// Mount routers
 app.use(`/api/auth`, auth);
 app.use(`/api/companies`, companies);
 app.use(`/api/users/me/favorites`, favorites);
