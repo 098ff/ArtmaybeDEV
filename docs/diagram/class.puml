@@ -27,9 +27,13 @@ class "Bookings" as BookingResource <<Resource>> {
 
 class "Companies" as CompanyResource <<Resource>> {
   +Paths /api/companies
+  +Paths /api/companies/{id}
   --
   +GET getCompanies(): Company[]
   +GET getCompany(id): Company
+  +POST createCompany(): Company
+  +PUT updateCompany(id): Company
+  +DELETE deleteCompany(id): void
 }
 
 class "UserModel" as UserRep <<Representation>> {
@@ -80,6 +84,7 @@ CompanyResource ..> CompanyRep : uses
 
 AuthMW ..> AuthResource    : protects
 AuthMW ..> BookingResource : protects / authorize
+AuthMW ..> CompanyResource : protects / authorize
 
 BookingRep "0..*" -down- UserRep    : user
 BookingRep "0..*" -down- CompanyRep : company
