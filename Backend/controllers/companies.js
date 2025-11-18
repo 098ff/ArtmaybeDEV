@@ -98,6 +98,59 @@ exports.getCompany = async (req, res, next) => {
     }
 };
 
+// @desc    Create a company
+// @route   POST /api/companies
+// @access  Private
+exports.createCompany = async (req, res, next) => {
+    const company = await Company.create(req.body);
+    res.status(201).json({
+        success: true,
+        data: company
+    });
+};
+
+// @desc    Update single company
+// @route   PUT /api/companies/:id
+// @access  Private
+exports.updateCompany = async (req, res, next) => {
+    try {
+        const company = await Company.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true // check ข้อมูลที่อัพเดทตรงตาม database ที่ตั้งไว้หรือเปล่า
+        });
+
+        if (!company) {
+            return res.status(400).json({ success: false });
+        }
+
+        res.status(200).json({ success: true, data: company });
+    } catch (err) {
+        res.status(400).json({ success: false });
+    }
+};
+
+// @desc    Delete company
+// @route   DELETE /api/companies/:id
+// @access  Private
+exports.deleteCompany = async (req, res, next) => {
+    try {
+        // เพื่อดึงข้อมูลบริษัทที่จะลบออกมาใช้
+        const company = await Company.findById(req.params.id);
+
+        if (!company) {
+            return res.status(400).json({ success: false });
+        }
+
+        // Cascade delete bookings when a company is deleted
+        await Booking.deleteMany({ company: req.params.id }); // ลบ Booking ที่เกี่ยวข้องกับบริษัทนี้ออกด้วย
+        await Company.deleteOne({ _id: req.params.id }); // ลบบริษัท
+
+        res.status(200).json({ success: true, data: {} });
+    } catch (err) {
+        res.status(400).json({ success: false });
+    }
+};
+
 // @desc    Search companies by REAL driving distance
 // @route   GET /api/companies/search/dist
 // @access  Private
