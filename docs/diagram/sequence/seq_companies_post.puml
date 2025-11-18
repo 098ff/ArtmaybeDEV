@@ -1,0 +1,61 @@
+@startuml
+title Companies Flow: POST /api/companies
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\ncompanies" as Router
+participant "«middleware»\nauth" as AuthMW
+participant "«controller»\ncompanies" as Ctrl
+participant "«model»\nCompany" as CompanyModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/companies ==
+Client -> Server : POST /api/companies
+activate Server
+Server -> Router : router.post('/companies', protect, authorize('admin'), createCompany)
+deactivate Server
+activate Router
+
+Router -> AuthMW : protect(req, res, next)
+activate AuthMW
+AuthMW -> DB : verify JWT / load user
+activate DB
+DB --> AuthMW : user or null
+deactivate DB
+
+alt valid token
+  AuthMW --> Router : next()
+else invalid or missing token
+  AuthMW --> Client : 401 Unauthorized { success: false message: 'Not authorize to access this route' }
+  deactivate AuthMW
+end
+deactivate AuthMW
+
+Router -> AuthMW : authorize('admin')(req, res, next)
+activate AuthMW
+
+alt user role is admin
+  AuthMW --> Router : next()
+else role not allowed
+  AuthMW --> Client : 403 Forbidden { success:false, message: 'User role <role> is not authorized' }
+  deactivate AuthMW
+  deactivate Server
+end
+deactivate AuthMW
+
+Router -> Ctrl : createCompany(req, res)
+deactivate Router
+activate Ctrl
+Ctrl -> CompanyModel : Company.create(req.body)
+activate CompanyModel
+CompanyModel -> DB : insert company
+activate DB
+DB --> CompanyModel : created company
+deactivate DB
+CompanyModel --> Ctrl : company
+deactivate CompanyModel
+
+Ctrl --> Client : 201 Created { success: true, data: company }
+deactivate Ctrl
+deactivate Router
+deactivate Server
+@enduml
