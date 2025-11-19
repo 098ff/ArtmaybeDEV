@@ -1,0 +1,85 @@
+@startuml
+title Companies Flow: DELETE /api/companies/:id
+actor Client
+participant "«Node.js»\nserver" as Server
+participant "«router»\ncompanies" as Router
+participant "«middleware»\nauth" as AuthMW
+participant "«controller»\ncompanies" as Ctrl
+participant "«model»\nCompany" as CompanyModel
+participant "«model»\nBooking" as BookingModel
+database "«MongoDB»\nDatabase" as DB
+
+== Api/companies/:id ==
+Client -> Server : DELETE /api/companies/:id
+activate Server
+Server -> Router : router.delete('/companies/:id', protect, authorize('admin'), deleteCompany)
+deactivate Server
+activate Router
+
+Router -> AuthMW : protect(req, res, next)
+activate AuthMW
+AuthMW -> DB : verify JWT / load user
+activate DB
+DB --> AuthMW : user or null
+deactivate DB
+
+alt valid token
+  AuthMW --> Router : next()
+else invalid or missing token
+  AuthMW --> Client : 401 Unauthorized { success: false message: 'Not authorize to access this route' }
+  deactivate AuthMW
+end
+deactivate AuthMW
+
+Router -> AuthMW : authorize('admin')(req, res, next)
+activate AuthMW
+
+alt role is admin
+  AuthMW --> Router : next()
+else role not allowed
+  AuthMW --> Client : 403 Forbidden { success:false, message: 'User role <role> is not authorized' }
+  deactivate AuthMW
+  deactivate Server
+end
+
+Router -> Ctrl : deleteCompany(req, res)
+deactivate Router
+activate Ctrl
+Ctrl -> CompanyModel : Company.findById(req.params.id)
+activate CompanyModel
+CompanyModel -> DB : find company by id
+activate DB
+DB --> CompanyModel : company or null
+deactivate DB
+CompanyModel --> Ctrl : company or null
+deactivate CompanyModel
+
+alt company not found
+  Ctrl --> Client : 400 Bad Request { success: false }
+else continue
+end
+
+Ctrl -> BookingModel : Booking.deleteMany({ company: req.params.id })
+activate BookingModel
+BookingModel -> DB : delete bookings by company
+activate DB
+DB --> BookingModel : delete result
+deactivate DB
+BookingModel --> Ctrl : done
+deactivate BookingModel
+
+Ctrl -> CompanyModel : Company.deleteOne({ _id: req.params.id })
+activate CompanyModel
+CompanyModel -> DB : delete company
+activate DB
+DB --> CompanyModel : delete result
+deactivate DB
+CompanyModel --> Ctrl : done
+deactivate CompanyModel
+
+Ctrl --> Client : 200 OK { success: true, data: {} }
+
+deactivate Ctrl
+deactivate Router
+deactivate Server
+@enduml

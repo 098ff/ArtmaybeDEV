@@ -22,6 +22,9 @@ rectangle "Service" {
     usecase "View Company List \n<b>GET /api/companies" as UC_Companies
     usecase "View Company Detail \n<b>GET /api/companies/{id}" as UC_CompanyDetail
     usecase "Search Companies by Distance \n<b>GET /api/companies/search/dist" as UC_CompanyDist
+    usecase "Create Company \n<b>POST /api/companies" as UC_CompanyCreate
+    usecase "Edit Company \n<b>PUT /api/companies/{id}" as UC_CompanyEdit
+    usecase "Delete Company \n<b>DELETE /api/companies/{id}" as UC_CompanyDelete
   }
   ' User
   package "Bookings" {
@@ -72,6 +75,9 @@ Admin --> UC_Companies
 Admin --> UC_CompanyDetail
 Admin --> UC_CompanyDist
 Admin --> UC_ViewAnyDetail
+Admin --> UC_CompanyCreate
+Admin --> UC_CompanyEdit
+Admin --> UC_CompanyDelete
 
 note right of UC_Book
   Limited to 3 bookings max per user
